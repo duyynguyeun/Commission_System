@@ -2,14 +2,14 @@ package com.comission.system.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
+@ToString
 @MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
