@@ -29,6 +29,12 @@ public class Product extends BaseEntity{
     @Column
     private Integer stockQuantity;
 
+    @Column
+    private String urlImage;
+
+    @Column
+    private String description;
+
     @OneToMany(mappedBy = "product")
     private List<AffiliateLink> affiliateLinks;
 }
