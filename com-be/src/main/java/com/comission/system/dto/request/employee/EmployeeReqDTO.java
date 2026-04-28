@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class EmployeeReqDTO {
-
     private Long parentId;
 
     @NotBlank(message = "Tên đăng nhập không được để trống")

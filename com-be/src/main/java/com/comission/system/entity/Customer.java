@@ -19,12 +19,6 @@ public class Customer extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String username;
-
-    @Column
-    private String password;
-
     @Column
     private String fullName;
 
@@ -33,4 +27,8 @@ public class Customer extends BaseEntity{
 
     @Column
     private String address;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
 }

@@ -1,5 +1,6 @@
 package com.comission.system.dto.request.customer;
 
+import com.comission.system.enums.EmployeeEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,7 @@ public class CustomerReqDTO {
 
     @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
+
+    @NotNull(message = "Vai trò của người dùng không được để trống")
+    private EmployeeEnum role;
 }

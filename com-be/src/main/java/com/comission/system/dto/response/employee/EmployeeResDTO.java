@@ -15,10 +15,11 @@ import java.time.Instant;
 public class EmployeeResDTO {
     private Long id;
     private Long parentId;
-    private String username;
-    private String password;
     private String fullName;
-    private EmployeeEnum role;
     private Instant createAt;
     private Instant updateAt;
+
+    private Long accountId;
+    private String username;
+    private EmployeeEnum role;
 }

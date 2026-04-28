@@ -17,7 +17,7 @@ public class AffiliateLink extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private String affCode;
 
     @Column

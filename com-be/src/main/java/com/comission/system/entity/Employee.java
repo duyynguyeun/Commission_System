@@ -1,6 +1,5 @@
 package com.comission.system.entity;
 
-import com.comission.system.enums.EmployeeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -22,15 +21,9 @@ public class Employee extends BaseEntity{
     private Long parentId;
 
     @Column
-    private String username;
-
-    @Column
-    private String password;
-
-    @Column
     private String fullName;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private EmployeeEnum role;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
 }
