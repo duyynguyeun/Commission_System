@@ -19,6 +19,6 @@ public class ProductResDTO {
     private Integer stockQuantity;
     private String urlImage;
     private String description;
-    private Instant crateAt;
-    private Instant updateAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }
