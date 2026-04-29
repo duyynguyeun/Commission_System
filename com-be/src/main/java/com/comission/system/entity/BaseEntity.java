@@ -16,8 +16,8 @@ import java.time.Instant;
 @SuperBuilder
 public class BaseEntity {
     @Column(name = "create_at")
-    private Instant createdAt;
+    private Instant createAt;
 
     @Column(name = "update_at")
-    private Instant updatedAt;
+    private Instant updateAt;
 }

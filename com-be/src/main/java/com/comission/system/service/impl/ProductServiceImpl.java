@@ -29,35 +29,35 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResDTO create(ProductReqDTO productReqDTO) {
-        logger.info("Create Product for name: {}", productReqDTO.getName());
+        logger.info("Tạo sản phẩm với tên là: {}", productReqDTO.getName());
         if(productRepository.existsByName(productReqDTO.getName())) {
             throw new BusinessException(ErrorCode.PRODUCT_002);
         }
         Product product = productMapper.toEntity(productReqDTO);
-        product.setCreatedAt(Instant.now());
-        product.setUpdatedAt(Instant.now());
+        product.setCreateAt(Instant.now());
+        product.setUpdateAt(Instant.now());
         productRepository.save(product);
         return productMapper.toResponse(product);
     }
 
     @Override
     public ProductResDTO update(Long id, ProductReqDTO productReqDTO) {
-        logger.info("Update Product for id: {}", id);
+        logger.info("Cập nhật sản phẩm có id là: {}", id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_001));
         productMapper.updateProductFromReq(productReqDTO, product);
-        product.setUpdatedAt(Instant.now());
+        product.setUpdateAt(Instant.now());
         productRepository.save(product);
         return productMapper.toResponse(product);
     }
 
     @Override
     public void delete(Long id) {
-        logger.info("Delete Product for id: {}", id);
+        logger.info("Xóa sản phẩm có id là: {}", id);
         if(productRepository.existsById(id)) {
             productRepository.deleteById(id);
         } else {
-            logger.info("Product not found for id: {}", id);
+            logger.info("Không tìm thấy sản phẩm có id là: {}", id);
             throw new BusinessException(ErrorCode.PRODUCT_001);
         }
     }
