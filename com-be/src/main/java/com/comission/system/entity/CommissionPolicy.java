@@ -29,15 +29,6 @@ public class CommissionPolicy extends BaseEntity {
     @Column
     private BigDecimal childRate;
 
-    @Column
-    private Boolean isActive;
-
-    @Column
-    private Instant effectiveFrom;
-
-    @Column
-    private Instant effectiveTo;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;

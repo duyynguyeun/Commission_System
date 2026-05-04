@@ -5,7 +5,10 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "affiliate_link")
+@Table(
+        name = "affiliate_link",
+        uniqueConstraints = @UniqueConstraint(name = "uk_affiliate_link_employee_product", columnNames = {"employee_id", "product_id"})
+)
 @Getter
 @Setter
 @ToString

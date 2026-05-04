@@ -14,23 +14,23 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderDetailReqDTO {
 
-    @NotNull(message = "Giá không được để trống")
+    @NotNull(message = "Gia khong duoc de trong")
     private BigDecimal price;
 
-    @NotNull(message = "Số lượng không được để trống")
+    @NotNull(message = "So luong khong duoc de trong")
     private Integer quantity;
 
-    @NotNull(message = "Mã đơn hàng không được để trống")
+    @NotNull(message = "Ma don hang khong duoc de trong")
     private Long customerOrderId;
 
-    @NotNull(message = "Mã sản phẩm không được để trống")
+    @NotNull(message = "Ma san pham khong duoc de trong")
     private Long productId;
 
-    @NotNull(message = "Mã người bán không được để trống")
     private Long sellerId;
 
     private Long parentId;
 
-    @NotNull(message = "Mã link sản phẩm không được để trống")
     private Long affiliateLinkId;
+
+    private String affCode;
 }

@@ -17,9 +17,6 @@ public class CommissionPolicyResDTO {
     private BigDecimal companyRate;
     private BigDecimal parentRate;
     private BigDecimal childRate;
-    private Boolean isActive;
-    private Instant effectiveFrom;
-    private Instant effectiveTo;
     private Long productId;
     private Instant createAt;
     private Instant updateAt;
