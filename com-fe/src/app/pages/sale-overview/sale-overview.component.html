@@ -1,0 +1,15 @@
+<section>
+  <h1>Sale doanh so</h1>
+  <div class="toolbar">
+    <input type="number" [(ngModel)]="employeeId" placeholder="Nhập ID nhân viên" />
+    <button (click)="load()">Tải dữ liệu</button>
+  </div>
+  <div *ngIf="data" class="grid">
+    <div>Own revenue: {{data.ownRevenue | number}}</div>
+    <div>Own commission: {{data.ownCommission | number}}</div>
+    <div>Related level revenue: {{data.relatedLevelRevenue | number}}</div>
+    <div>Related level commission: {{data.relatedLevelCommission | number}}</div>
+    <div>Total revenue: {{data.totalRevenue | number}}</div>
+    <div>Total commission: {{data.totalCommission | number}}</div>
+  </div>
+</section>

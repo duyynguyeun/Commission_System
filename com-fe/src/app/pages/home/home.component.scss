@@ -1,0 +1,149 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  color: #fff;
+  background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1900&q=80');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(22, 163, 74, 0.18), rgba(10, 20, 30, 0.78));
+}
+
+.topbar, .hero-content, .auth-card { position: relative; z-index: 2; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(2, 44, 34, 0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.brand-wrap { display: flex; align-items: center; gap: 12px; }
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: linear-gradient(145deg, #facc15, #f59e0b);
+  color: #111827;
+}
+
+.brand-text { display: grid; }
+.brand-text small { opacity: 0.8; }
+
+.auth-info { display: flex; align-items: center; gap: 10px; }
+.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; }
+
+.auth-buttons { display:flex; gap:8px; align-items:center }
+.auth-buttons .btn-login, .auth-buttons .btn-register {
+  padding:8px 14px; border-radius:18px; border:0; font-weight:700; cursor:pointer
+}
+.auth-buttons .btn-login { background: linear-gradient(145deg,#0ea5e9,#0369a1); color:#fff }
+.auth-buttons .btn-register { background: rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.12) }
+
+.hero-content {
+  margin: 100px 0 0 84px;
+  max-width: 670px;
+}
+
+.sub {
+  color: #facc15;
+  letter-spacing: 2.3px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 10px 0 12px;
+  font-size: 62px;
+  line-height: 1.05;
+}
+
+.desc {
+  font-size: 21px;
+  color: #e2e8f0;
+  line-height: 1.55;
+  max-width: 610px;
+}
+
+.auth-card {
+  position: absolute;
+  right: 42px;
+  top: 104px;
+  width: 390px;
+  background: rgba(255,255,255,0.96);
+  color: #0f172a;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 18px 35px rgba(2, 6, 23, 0.35);
+}
+
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.tabs button {
+  border: 0;
+  background: #e2e8f0;
+  color: #334155;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.tabs button.active {
+  background: linear-gradient(145deg, #0ea5e9, #0369a1);
+  color: #fff;
+}
+
+.form {
+  display: grid;
+  gap: 8px;
+}
+
+label {
+  font-size: 12px;
+  color: #475569;
+  margin-top: 4px;
+}
+
+input, select {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.primary {
+  margin-top: 10px;
+  border: 0;
+  border-radius: 10px;
+  padding: 11px;
+  color: white;
+  background: linear-gradient(145deg, #16a34a, #15803d);
+  font-weight: 700;
+}
+
+.message {
+  min-height: 22px;
+  color: #1d4ed8;
+  font-weight: 600;
+  margin: 10px 2px 2px;
+}
+
+@media (max-width: 1024px) {
+  .hero-content { margin: 76px 22px 0; }
+  h1 { font-size: 44px; }
+  .auth-card {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: calc(100% - 44px);
+    margin: 18px 22px 22px;
+  }
+}

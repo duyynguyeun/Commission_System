@@ -1,0 +1,16 @@
+<section>
+  <h1>Sale lich su ban</h1>
+  <div class="toolbar">
+    <input type="number" [(ngModel)]="employeeId" placeholder="ID nhân viên" />
+    <button (click)="load()">Tải dữ liệu</button>
+  </div>
+  <table *ngIf="data.length">
+    <thead><tr><th>OrderDetail</th><th>San pham</th><th>SL</th><th>Doanh thu dong</th><th>Role</th><th>Ty le</th><th>Hoa hong</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let item of data">
+        <td>{{item.orderDetailId}}</td><td>{{item.productName}}</td><td>{{item.quantity}}</td>
+        <td>{{item.lineRevenue | number}}</td><td>{{item.commissionRole}}</td><td>{{item.commissionRate}}%</td><td>{{item.commissionAmount | number}}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

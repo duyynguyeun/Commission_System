@@ -1,0 +1,67 @@
+<div class="app-container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Commission<span class="text-primary">Admin</span></h2>
+    </div>
+
+    <div class="sidebar-menu">
+      <div class="menu-group" *ngIf="isAdmin()">
+        <p class="menu-title">ADMIN</p>
+        <a routerLink="/app/admin/products" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-cube'></i> Doanh thu sản phẩm
+        </a>
+        <a routerLink="/app/admin/company" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-building'></i> Doanh thu công ty
+        </a>
+        <a routerLink="/app/admin/employees" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-user-pin'></i> Doanh thu nhân viên
+        </a>
+      </div>
+
+      <div class="menu-group" *ngIf="isSale()">
+        <p class="menu-title">SALE</p>
+        <a routerLink="/app/order-detail" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-cart-add'></i> Tạo giao dịch bán
+        </a>
+        <a routerLink="/app/sale/history" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-history'></i> Lịch sử bán
+        </a>
+        <a routerLink="/app/sale/overview" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-line-chart'></i> Doanh số
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <i class='bx bx-log-out'></i> Đăng xuất
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-wrapper">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h3>Quản trị hệ thống</h3>
+        <p>Chào mừng quay trở lại làm việc!</p>
+      </div>
+      <div class="topbar-right" *ngIf="user">
+        <div class="user-info">
+          <div class="user-avatar">{{userInitial}}</div>
+          <div class="user-details">
+            <span class="user-name">{{user.username}}</span>
+            <span class="user-role">{{user.role}}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

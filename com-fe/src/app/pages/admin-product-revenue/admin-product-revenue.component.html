@@ -1,0 +1,11 @@
+<section>
+  <h1>Admin doanh thu tung san pham</h1>
+  <table *ngIf="data.length">
+    <thead><tr><th>ProductId</th><th>Ten san pham</th><th>Doanh thu</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let item of data">
+        <td>{{item.productId}}</td><td>{{item.productName}}</td><td>{{item.revenue | number}}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

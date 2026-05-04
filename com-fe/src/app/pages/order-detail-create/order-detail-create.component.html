@@ -1,0 +1,14 @@
+<section>
+  <h1>Tạo giao dịch bán (Order Detail)</h1>
+  <div class="form-grid">
+    <input type="number" [(ngModel)]="model.price" placeholder="Giá" />
+    <input type="number" [(ngModel)]="model.quantity" placeholder="Số lượng" />
+    <input type="number" [(ngModel)]="model.customerOrderId" placeholder="ID Đơn hàng" />
+    <input type="number" [(ngModel)]="model.productId" placeholder="ID Sản phẩm" />
+    <input type="number" [(ngModel)]="model.sellerId" placeholder="ID Người bán" />
+    <input type="number" [(ngModel)]="model.parentId" placeholder="ID Cha (tùy chọn)" />
+    <input type="number" [(ngModel)]="model.affiliateLinkId" placeholder="ID Liên kết Affiliate" />
+  </div>
+  <button (click)="submit()">Tạo giao dịch</button>
+  <p>{{message}}</p>
+</section>
