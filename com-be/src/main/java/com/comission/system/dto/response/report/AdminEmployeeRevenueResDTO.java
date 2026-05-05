@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 public class AdminEmployeeRevenueResDTO {
     private Long employeeId;
     private String employeeName;
+    private String role;
     private BigDecimal salesRevenue;
     private BigDecimal totalCommission;
 }

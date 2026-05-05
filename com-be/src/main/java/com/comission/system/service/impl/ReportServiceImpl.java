@@ -8,6 +8,7 @@ import com.comission.system.entity.CommissionTransaction;
 import com.comission.system.entity.Employee;
 import com.comission.system.entity.OrderDetail;
 import com.comission.system.entity.Product;
+import com.comission.system.enums.EmployeeEnum;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.repository.CommissionTransactionRepository;
@@ -17,6 +18,7 @@ import com.comission.system.repository.ProductRepository;
 import com.comission.system.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
     private final EmployeeRepository employeeRepository;
     private final OrderDetailRepository orderDetailRepository;
@@ -162,12 +165,19 @@ public class ReportServiceImpl implements ReportService {
     public List<AdminEmployeeRevenueResDTO> getEmployeeRevenue() {
         Map<Long, AdminEmployeeRevenueResDTO> map = new LinkedHashMap<>();
         for (Employee employee : employeeRepository.findAll()) {
-            map.put(employee.getId(), AdminEmployeeRevenueResDTO.builder()
-                    .employeeId(employee.getId())
-                    .employeeName(employee.getFullName())
-                    .salesRevenue(BigDecimal.ZERO)
-                    .totalCommission(BigDecimal.ZERO)
-                    .build());
+            if (employee.getAccount() == null) continue;
+            EmployeeEnum role = employee.getAccount().getRole();
+            
+            // Chỉ lấy các vai trò SALE
+            if (role == EmployeeEnum.SALE_PARENT || role == EmployeeEnum.SALE_CHILD) {
+                map.put(employee.getId(), AdminEmployeeRevenueResDTO.builder()
+                        .employeeId(employee.getId())
+                        .employeeName(employee.getFullName())
+                        .role(role.name())
+                        .salesRevenue(BigDecimal.ZERO)
+                        .totalCommission(BigDecimal.ZERO)
+                        .build());
+            }
         }
 
         for (OrderDetail orderDetail : orderDetailRepository.findAll()) {
