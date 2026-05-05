@@ -4,6 +4,7 @@ public enum ErrorCode {
     // PRODUCT
     PRODUCT_001("PRODUCT_001", "Không tìm thấy sản phẩm!"),
     PRODUCT_002("PRODUCT_002", "Tên sản phẩm đã tồn tại!"),
+    PRODUCT_003("PRODUCT_003", "Sản phẩm đã hết hàng hoặc không đủ số lượng!"),
 
     // AFFILIATE_LINK
     LINK_001("LINK_001", "Tạo link affiliate không thành công!"),

@@ -25,7 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/reports/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/reports/sales/**", "/api/order-details/**").hasAnyRole("ADMIN", "SALE_PARENT", "SALE_CHILD")
+                        .requestMatchers("/api/reports/sales/**", "/api/order-details/**").hasAnyRole("ADMIN", "SALE_PARENT", "SALE_CHILD", "CUSTOMER")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();

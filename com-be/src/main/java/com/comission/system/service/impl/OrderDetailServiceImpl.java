@@ -5,6 +5,7 @@ import com.comission.system.dto.response.orderDetail.OrderDetailResDTO;
 import com.comission.system.entity.AffiliateLink;
 import com.comission.system.entity.Employee;
 import com.comission.system.entity.OrderDetail;
+import com.comission.system.entity.Product;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.mapper.OrderDetailMapper;
@@ -12,6 +13,7 @@ import com.comission.system.repository.AffiliateLinkRepository;
 import com.comission.system.repository.EmployeeRepository;
 import com.comission.system.repository.OrderDetailRepository;
 import com.comission.system.service.OrderDetailService;
+import com.comission.system.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,14 +28,31 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final AffiliateLinkRepository affiliateLinkRepository;
     private final EmployeeRepository employeeRepository;
     private final OrderDetailMapper orderDetailMapper;
+    private final ProductRepository productRepository;
 
     @Override
     public OrderDetailResDTO create(OrderDetailReqDTO reqDTO) {
         OrderDetail orderDetail = orderDetailMapper.toEntity(reqDTO);
+        
+        // Trừ tồn kho
+        deductStock(orderDetail.getProduct().getId(), orderDetail.getQuantity());
+
         applyAffiliateHierarchy(orderDetail, reqDTO);
         validateHierarchy(orderDetail);
         OrderDetail saved = orderDetailRepository.save(orderDetail);
         return orderDetailMapper.toResponse(saved);
+    }
+
+    private void deductStock(Long productId, Integer quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_001));
+        
+        if (product.getStockQuantity() < quantity) {
+            throw new BusinessException(ErrorCode.PRODUCT_003);
+        }
+        
+        product.setStockQuantity(product.getStockQuantity() - quantity);
+        productRepository.save(product);
     }
 
     @Override
@@ -62,12 +81,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     private void applyAffiliateHierarchy(OrderDetail orderDetail, OrderDetailReqDTO reqDTO) {
         AffiliateLink affiliateLink = resolveAffiliateLink(reqDTO);
+        
+        // Luôn set để ghi đè các object stub có thể được tạo bởi Mapper
+        orderDetail.setAffiliateLink(affiliateLink);
+        
         if (affiliateLink == null) {
+            orderDetail.setSeller(null);
+            orderDetail.setParent(null);
             return;
         }
 
         Employee seller = affiliateLink.getEmployee();
-        orderDetail.setAffiliateLink(affiliateLink);
         orderDetail.setSeller(seller);
 
         if (seller != null && seller.getParentId() != null) {

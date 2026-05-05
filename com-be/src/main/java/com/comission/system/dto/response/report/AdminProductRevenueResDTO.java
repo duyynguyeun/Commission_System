@@ -14,5 +14,7 @@ import java.math.BigDecimal;
 public class AdminProductRevenueResDTO {
     private Long productId;
     private String productName;
+    private BigDecimal price;
+    private Integer quantitySold;
     private BigDecimal revenue;
 }

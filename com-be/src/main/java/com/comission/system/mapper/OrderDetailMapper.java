@@ -8,13 +8,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(config = MapperConfiguaration.class)
+@Mapper(config = MapperConfiguaration.class, componentModel = "spring")
 public interface OrderDetailMapper {
     @Mapping(target = "customerOrder.id", source = "customerOrderId")
     @Mapping(target = "product.id", source = "productId")
-    @Mapping(target = "seller.id", source = "sellerId")
-    @Mapping(target = "parent.id", source = "parentId")
-    @Mapping(target = "affiliateLink.id", source = "affiliateLinkId")
+    @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "affiliateLink", ignore = true)
     OrderDetail toEntity(OrderDetailReqDTO req);
 
     @Mapping(target = "customerOrderId", source = "customerOrder.id")
@@ -26,8 +26,8 @@ public interface OrderDetailMapper {
 
     @Mapping(target = "customerOrder.id", source = "customerOrderId")
     @Mapping(target = "product.id", source = "productId")
-    @Mapping(target = "seller.id", source = "sellerId")
-    @Mapping(target = "parent.id", source = "parentId")
-    @Mapping(target = "affiliateLink.id", source = "affiliateLinkId")
+    @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "affiliateLink", ignore = true)
     void updateFromReq(OrderDetailReqDTO req, @MappingTarget OrderDetail orderDetail);
 }

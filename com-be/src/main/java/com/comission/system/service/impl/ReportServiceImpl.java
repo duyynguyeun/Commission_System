@@ -7,11 +7,13 @@ import com.comission.system.dto.response.report.SaleOverviewResDTO;
 import com.comission.system.entity.CommissionTransaction;
 import com.comission.system.entity.Employee;
 import com.comission.system.entity.OrderDetail;
+import com.comission.system.entity.Product;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.repository.CommissionTransactionRepository;
 import com.comission.system.repository.EmployeeRepository;
 import com.comission.system.repository.OrderDetailRepository;
+import com.comission.system.repository.ProductRepository;
 import com.comission.system.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class ReportServiceImpl implements ReportService {
     private final EmployeeRepository employeeRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final CommissionTransactionRepository commissionTransactionRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public List<SaleHistoryResDTO> getSaleHistory(Long employeeId) {
@@ -121,20 +124,30 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<AdminProductRevenueResDTO> getProductRevenue() {
         Map<Long, AdminProductRevenueResDTO> map = new LinkedHashMap<>();
+        
+        // Khoi tao map voi tat ca san pham
+        for (Product product : productRepository.findAll()) {
+            map.put(product.getId(), AdminProductRevenueResDTO.builder()
+                    .productId(product.getId())
+                    .productName(product.getName())
+                    .price(product.getPrice())
+                    .quantitySold(0)
+                    .revenue(BigDecimal.ZERO)
+                    .build());
+        }
+
+        // Tinh toan tu cac don hang
         for (OrderDetail orderDetail : orderDetailRepository.findAll()) {
-            Long productId = orderDetail.getProduct().getId();
-            AdminProductRevenueResDTO current = map.get(productId);
-            BigDecimal line = lineRevenue(orderDetail);
-            if (current == null) {
-                map.put(productId, AdminProductRevenueResDTO.builder()
-                        .productId(productId)
-                        .productName(orderDetail.getProduct().getName())
-                        .revenue(line)
-                        .build());
-            } else {
-                current.setRevenue(current.getRevenue().add(line));
+            if (orderDetail.getProduct() == null) continue;
+            
+            AdminProductRevenueResDTO dto = map.get(orderDetail.getProduct().getId());
+            if (dto != null) {
+                BigDecimal line = lineRevenue(orderDetail);
+                dto.setQuantitySold(dto.getQuantitySold() + orderDetail.getQuantity());
+                dto.setRevenue(dto.getRevenue().add(line));
             }
         }
+        
         return new ArrayList<>(map.values());
     }
 
