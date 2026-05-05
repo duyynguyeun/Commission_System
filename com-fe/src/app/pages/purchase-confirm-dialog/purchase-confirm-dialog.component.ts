@@ -70,8 +70,8 @@ export class PurchaseConfirmDialogComponent implements OnInit {
           quantity: this.quantity,
           customerOrderId: customerOrderId,
           productId: this.data.product.id,
-          sellerId: 0, // Fallback since customer directly buys
-          affiliateLinkId: 0 // No affiliate
+          sellerId: null, // Direct purchase
+          affiliateLinkId: null // No affiliate link
         }).subscribe({
           next: () => {
             this.loading = false;

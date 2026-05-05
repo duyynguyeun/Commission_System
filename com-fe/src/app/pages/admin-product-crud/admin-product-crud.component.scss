@@ -88,17 +88,37 @@
 
 /* ── Pagination ── */
 .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f3f4f6; }
-.pg-info { font-size: 13px; color: #9ca3af; }
-.pg-controls { display: flex; align-items: center; gap: 2px; }
+.pg-info { font-size: 14px; color: #57606f; b { color: #2f3542; font-weight: 600; } }
+.pg-controls { display: flex; align-items: center; gap: 4px; }
 .pg-dots { padding: 0 6px; color: #9ca3af; font-size: 14px; }
 .pg-btn {
   min-width: 32px; height: 32px; padding: 0 8px; border: none; border-radius: 6px;
-  background: transparent; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; transition: all .15s;
-  i { font-size: 18px; }
-  &.active { background: #3b82f6; color: #fff; }
-  &:hover:not(:disabled):not(.active) { background: #f3f4f6; }
-  &:disabled { opacity: .3; cursor: not-allowed; }
+  background: transparent; color: #57606f; font-size: 14px; font-weight: 500; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; transition: all .2s;
+  
+  i { font-size: 20px; color: #a4b0be; }
+  
+  &.active { 
+    background: #fff2e8; // Light orange background
+    color: #ff7a45;      // Orange text
+    border: 1px solid #ffbb96; // Subtle border
+    font-weight: 700;
+  }
+  
+  &:hover:not(:disabled):not(.active) { 
+    background: #f1f2f6; 
+    color: #2f3542;
+  }
+  
+  &:disabled { 
+    opacity: .2; 
+    cursor: not-allowed; 
+  }
+  
+  &.nav-btn {
+    i { color: #ced6e0; }
+    &:hover:not(:disabled) i { color: #57606f; }
+  }
 }
 
 /* ── Toast ── */

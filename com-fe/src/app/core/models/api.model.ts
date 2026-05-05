@@ -81,6 +81,27 @@ export interface SaleOverview {
   employeeId: number;
   ownRevenue: number;
   ownCommission: number;
+  totalPrice: number;
+  status: 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCEL';
+  customerId: number;
+}
+
+export interface SaleHistoryItem {
+  orderDetailId: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  lineRevenue: number;
+  commissionRole: string;
+  commissionRate: number;
+  commissionAmount: number;
+  transactionAt: string;
+}
+
+export interface SaleOverview {
+  employeeId: number;
+  ownRevenue: number;
+  ownCommission: number;
   relatedLevelRevenue: number;
   relatedLevelCommission: number;
   totalRevenue: number;
@@ -90,6 +111,8 @@ export interface SaleOverview {
 export interface AdminProductRevenue {
   productId: number;
   productName: string;
+  price: number;
+  quantitySold: number;
   revenue: number;
 }
 
@@ -145,7 +168,7 @@ export interface OrderDetailReq {
   quantity: number;
   customerOrderId: number;
   productId: number;
-  sellerId: number;
-  parentId?: number;
-  affiliateLinkId: number;
+  sellerId: number | null;
+  parentId?: number | null;
+  affiliateLinkId: number | null;
 }
