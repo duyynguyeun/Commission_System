@@ -73,14 +73,22 @@ public class AffiliateLinkServiceImpl implements AffiliateLinkService {
         AffiliateLink existing = affiliateLinkRepository
                 .findByEmployee_IdAndProduct_Id(saleId, reqDTO.getProductId())
                 .orElse(null);
+
+        String affCode = (existing != null) ? existing.getAffCode() : generateAffCode();
+        String expectedUrl = String.format("/app/products/%d?aff=%s", product.getId(), affCode);
+
         if (existing != null) {
+            if (!expectedUrl.equals(existing.getAffUrl())) {
+                existing.setAffUrl(expectedUrl);
+                existing.setUpdateAt(Instant.now());
+                affiliateLinkRepository.save(existing);
+            }
             return affiliateLinkMapper.toResponse(existing);
         }
 
-        String affCode = generateAffCode();
         AffiliateLink link = AffiliateLink.builder()
                 .affCode(affCode)
-                .affUrl(BUY_PATH + affCode)
+                .affUrl(expectedUrl)
                 .employee(sale)
                 .product(product)
                 .createAt(Instant.now())

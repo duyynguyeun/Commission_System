@@ -2,11 +2,14 @@ package com.comission.system.service.impl;
 
 import com.comission.system.dto.request.product.ProductReqDTO;
 import com.comission.system.dto.response.product.ProductResDTO;
+import com.comission.system.dto.response.product.SaleProductResDTO;
+import com.comission.system.entity.CommissionPolicy;
 import com.comission.system.entity.Product;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.exception.NotFoundException;
 import com.comission.system.mapper.ProductMapper;
+import com.comission.system.repository.CommissionPolicyRepository;
 import com.comission.system.repository.ProductRepository;
 import com.comission.system.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Service
@@ -25,6 +29,7 @@ import java.time.Instant;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CommissionPolicyRepository commissionPolicyRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
@@ -66,5 +71,25 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResDTO> findAll(Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(productMapper::toResponse);
+    }
+
+    @Override
+    public Page<SaleProductResDTO> findAllForSale(Pageable pageable) {
+        return productRepository.findAll(pageable).map(product -> {
+            CommissionPolicy policy = commissionPolicyRepository.findFirstByProduct_Id(product.getId()).orElse(null);
+            BigDecimal parentRate = policy != null ? policy.getParentRate() : BigDecimal.ZERO;
+            BigDecimal childRate = policy != null ? policy.getChildRate() : BigDecimal.ZERO;
+            BigDecimal maxRate = parentRate.add(childRate);
+            BigDecimal maxAmount = product.getPrice().multiply(maxRate).divide(BigDecimal.valueOf(100));
+
+            return SaleProductResDTO.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .maxCommissionRate(maxRate)
+                    .maxCommissionAmount(maxAmount)
+                    .urlImage(product.getUrlImage())
+                    .build();
+        });
     }
 }

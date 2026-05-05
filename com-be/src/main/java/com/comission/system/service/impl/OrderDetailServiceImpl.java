@@ -2,23 +2,20 @@ package com.comission.system.service.impl;
 
 import com.comission.system.dto.request.orderDetail.OrderDetailReqDTO;
 import com.comission.system.dto.response.orderDetail.OrderDetailResDTO;
-import com.comission.system.entity.AffiliateLink;
-import com.comission.system.entity.Employee;
-import com.comission.system.entity.OrderDetail;
-import com.comission.system.entity.Product;
+import com.comission.system.entity.*;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.mapper.OrderDetailMapper;
-import com.comission.system.repository.AffiliateLinkRepository;
-import com.comission.system.repository.EmployeeRepository;
-import com.comission.system.repository.OrderDetailRepository;
+import com.comission.system.repository.*;
 import com.comission.system.service.OrderDetailService;
-import com.comission.system.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Service
 @Transactional
@@ -29,6 +26,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final EmployeeRepository employeeRepository;
     private final OrderDetailMapper orderDetailMapper;
     private final ProductRepository productRepository;
+    private final CommissionPolicyRepository commissionPolicyRepository;
+    private final CommissionTransactionRepository commissionTransactionRepository;
 
     @Override
     public OrderDetailResDTO create(OrderDetailReqDTO reqDTO) {
@@ -40,6 +39,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         applyAffiliateHierarchy(orderDetail, reqDTO);
         validateHierarchy(orderDetail);
         OrderDetail saved = orderDetailRepository.save(orderDetail);
+        
+        calculateAndSaveCommissions(saved);
+        
         return orderDetailMapper.toResponse(saved);
     }
 
@@ -124,5 +126,38 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 && !orderDetail.getSeller().getParentId().equals(orderDetail.getParent().getId())) {
             throw new BusinessException(ErrorCode.EMPLOYEE_001);
         }
+    }
+
+    private void calculateAndSaveCommissions(OrderDetail orderDetail) {
+        if (orderDetail.getSeller() == null) return;
+
+        CommissionPolicy policy = commissionPolicyRepository.findFirstByProduct_Id(orderDetail.getProduct().getId())
+                .orElse(null);
+        if (policy == null) return;
+
+        BigDecimal totalPrice = orderDetail.getPrice().multiply(BigDecimal.valueOf(orderDetail.getQuantity()));
+
+        // 1. Commission for Seller (Child rate)
+        if (policy.getChildRate() != null && policy.getChildRate().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal sellerAmount = totalPrice.multiply(policy.getChildRate()).divide(BigDecimal.valueOf(100));
+            saveTransaction(orderDetail.getSeller(), orderDetail, sellerAmount, policy.getChildRate());
+        }
+
+        // 2. Commission for Parent (Parent rate)
+        if (orderDetail.getParent() != null && policy.getParentRate() != null && policy.getParentRate().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal parentAmount = totalPrice.multiply(policy.getParentRate()).divide(BigDecimal.valueOf(100));
+            saveTransaction(orderDetail.getParent(), orderDetail, parentAmount, policy.getParentRate());
+        }
+    }
+
+    private void saveTransaction(Employee employee, OrderDetail orderDetail, BigDecimal amount, BigDecimal rate) {
+        CommissionTransaction transaction = CommissionTransaction.builder()
+                .employee(employee)
+                .orderDetail(orderDetail)
+                .commissionAmount(amount)
+                .commissionRate(rate)
+                .createAt(Instant.now())
+                .build();
+        commissionTransactionRepository.save(transaction);
     }
 }

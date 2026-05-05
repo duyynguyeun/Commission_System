@@ -4,6 +4,7 @@ import com.comission.system.dto.request.product.ProductReqDTO;
 import com.comission.system.dto.response.ApiResponse;
 import com.comission.system.dto.response.page.PageResponse;
 import com.comission.system.dto.response.product.ProductResDTO;
+import com.comission.system.dto.response.product.SaleProductResDTO;
 import com.comission.system.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,12 @@ public class ProductController {
     @GetMapping
     public ApiResponse<PageResponse<ProductResDTO>> findAll(@PageableDefault(size = 10, page = 0) Pageable pageable) {
         Page<ProductResDTO> products = productService.findAll(pageable);
+        return ApiResponse.success(new PageResponse<>(products));
+    }
+
+    @GetMapping("/sale")
+    public ApiResponse<PageResponse<SaleProductResDTO>> findAllForSale(@PageableDefault(size = 10, page = 0) Pageable pageable) {
+        Page<SaleProductResDTO> products = productService.findAllForSale(pageable);
         return ApiResponse.success(new PageResponse<>(products));
     }
 }
