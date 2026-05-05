@@ -1,0 +1,50 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>Danh sách sản phẩm</h2>
+    <p>Khám phá các sản phẩm nổi bật của chúng tôi</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">Đang tải dữ liệu...</div>
+
+  <div class="product-grid-container" *ngIf="!loading && products.length > 0">
+    <ag-grid-angular
+      style="width: 100%; height: calc(100vh - 250px);"
+      class="ag-theme-alpine custom-ag-grid"
+      [rowData]="products"
+      [columnDefs]="columnDefs"
+      [pagination]="true"
+      [paginationPageSize]="10"
+      [suppressPaginationPanel]="true"
+      [rowHeight]="60"
+      [headerHeight]="50"
+      [suppressCellSelection]="true"
+      (gridReady)="onGridReady($event)"
+      (rowClicked)="onRowClicked($event)"
+    >
+    </ag-grid-angular>
+
+    <div class="custom-pagination">
+      <div class="pagination-info">
+        {{ (currentPage - 1) * 10 + 1 }}-{{ Math.min(currentPage * 10, totalRecords) }} của {{ totalRecords }} kết quả
+      </div>
+      <div class="pagination-controls">
+        <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="goToPage(1)"><i class='bx bx-chevrons-left'></i></button>
+        <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)"><i class='bx bx-chevron-left'></i></button>
+        
+        <button class="page-btn" *ngFor="let p of getPages()" 
+                [class.active]="p === currentPage" 
+                (click)="goToPage(p)">
+          {{ p }}
+        </button>
+
+        <button class="page-btn nav-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)"><i class='bx bx-chevron-right'></i></button>
+        <button class="page-btn nav-btn" [disabled]="currentPage === totalPages" (click)="goToPage(totalPages)"><i class='bx bx-chevrons-right'></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && products.length === 0" class="empty-state">
+    <i class='bx bx-box'></i>
+    <p>Chưa có sản phẩm nào</p>
+  </div>
+</div>

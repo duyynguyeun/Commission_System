@@ -20,6 +20,11 @@ import { LoginComponent } from './pages/login/login.component';
 import { HomeComponent } from './pages/home/home.component';
 import { RegisterDialogComponent } from './pages/register-dialog/register-dialog.component';
 import { AuthInterceptor } from './core/guards/auth.interceptor';
+import { ProductListComponent } from './pages/product-list/product-list.component';
+import { ProductDetailComponent } from './pages/product-detail/product-detail.component';
+import { PurchaseConfirmDialogComponent } from './pages/purchase-confirm-dialog/purchase-confirm-dialog.component';
+import { AdminProductCrudComponent } from './pages/admin-product-crud/admin-product-crud.component';
+import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.component';
 
 @NgModule({
   declarations: [
@@ -32,8 +37,13 @@ import { AuthInterceptor } from './core/guards/auth.interceptor';
     AdminCompanyRevenueComponent,
     AdminEmployeeRevenueComponent,
     LoginComponent,
-    HomeComponent
-    ,RegisterDialogComponent
+    HomeComponent,
+    RegisterDialogComponent,
+    ProductListComponent,
+    ProductDetailComponent,
+    PurchaseConfirmDialogComponent,
+    AdminProductCrudComponent,
+    AdminUserCrudComponent
   ],
   imports: [
     BrowserModule,

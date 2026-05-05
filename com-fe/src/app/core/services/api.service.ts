@@ -6,7 +6,15 @@ import {
   AdminEmployeeRevenue,
   AdminProductRevenue,
   ApiResponse,
+  Customer,
+  CustomerOrderReq,
+  CustomerReq,
+  Employee,
+  EmployeeReq,
   OrderDetailReq,
+  PageResponse,
+  Product,
+  ProductReq,
   SaleHistoryItem,
   SaleOverview
 } from '../models/api.model';
@@ -39,5 +47,57 @@ export class ApiService {
 
   createOrderDetail(payload: OrderDetailReq): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.base}/order-details`, payload);
+  }
+
+  getProducts(page: number = 0, size: number = 20): Observable<ApiResponse<PageResponse<Product>>> {
+    return this.http.get<ApiResponse<PageResponse<Product>>>(`${this.base}/products?page=${page}&size=${size}`);
+  }
+
+  createProduct(payload: ProductReq): Observable<ApiResponse<Product>> {
+    return this.http.post<ApiResponse<Product>>(`${this.base}/products`, payload);
+  }
+
+  updateProduct(id: number, payload: ProductReq): Observable<ApiResponse<Product>> {
+    return this.http.post<ApiResponse<Product>>(`${this.base}/products/${id}`, payload);
+  }
+
+  deleteProduct(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/products/${id}`);
+  }
+
+  getEmployees(page: number = 0, size: number = 20): Observable<ApiResponse<PageResponse<Employee>>> {
+    return this.http.get<ApiResponse<PageResponse<Employee>>>(`${this.base}/employees?page=${page}&size=${size}`);
+  }
+
+  createEmployee(payload: EmployeeReq): Observable<ApiResponse<Employee>> {
+    return this.http.post<ApiResponse<Employee>>(`${this.base}/employees`, payload);
+  }
+
+  updateEmployee(id: number, payload: EmployeeReq): Observable<ApiResponse<Employee>> {
+    return this.http.post<ApiResponse<Employee>>(`${this.base}/employees/${id}`, payload);
+  }
+
+  deleteEmployee(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/employees/${id}`);
+  }
+
+  getCustomers(page: number = 0, size: number = 20): Observable<ApiResponse<PageResponse<Customer>>> {
+    return this.http.get<ApiResponse<PageResponse<Customer>>>(`${this.base}/customers?page=${page}&size=${size}`);
+  }
+
+  createCustomer(payload: CustomerReq): Observable<ApiResponse<Customer>> {
+    return this.http.post<ApiResponse<Customer>>(`${this.base}/customers`, payload);
+  }
+
+  updateCustomer(id: number, payload: CustomerReq): Observable<ApiResponse<Customer>> {
+    return this.http.post<ApiResponse<Customer>>(`${this.base}/customers/${id}`, payload);
+  }
+
+  deleteCustomer(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.base}/customers/${id}`);
+  }
+
+  createCustomerOrder(payload: CustomerOrderReq): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.base}/orders`, payload);
   }
 }

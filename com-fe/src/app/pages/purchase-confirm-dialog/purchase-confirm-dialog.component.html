@@ -1,0 +1,44 @@
+<div class="dialog-card">
+  <div class="dialog-header">
+    <div class="title">Xác nhận mua hàng</div>
+  </div>
+  
+  <div class="dialog-body">
+    <div class="product-summary">
+      <div class="img-wrapper">
+        <img [src]="data.product.urlImage || 'assets/placeholder-product.png'" [alt]="data.product.name" (error)="data.product.urlImage = ''">
+        <i class='bx bx-image' *ngIf="!data.product.urlImage"></i>
+      </div>
+      <div class="info">
+        <h4 class="name">{{data.product.name}}</h4>
+        <p class="price">{{data.product.price | number:'1.0-0'}} đ</p>
+      </div>
+    </div>
+
+    <div class="purchase-form">
+      <div class="form-row">
+        <label>Số lượng</label>
+        <div class="quantity-control">
+          <button type="button" (click)="decrement()" [disabled]="quantity <= 1">-</button>
+          <input type="number" [(ngModel)]="quantity" min="1" [max]="data.product.stockQuantity" readonly>
+          <button type="button" (click)="increment()" [disabled]="quantity >= data.product.stockQuantity">+</button>
+        </div>
+      </div>
+
+      <div class="form-row total-row">
+        <label>Tổng tiền</label>
+        <div class="total-price">{{totalPrice | number:'1.0-0'}} đ</div>
+      </div>
+    </div>
+
+    <p class="dialog-error" *ngIf="error">{{error}}</p>
+  </div>
+
+  <div class="dialog-actions">
+    <button type="button" class="btn-secondary" (click)="close()" [disabled]="loading">Hủy bỏ</button>
+    <button type="button" class="btn-primary" (click)="submit()" [disabled]="loading || quantity < 1">
+      <span *ngIf="!loading">Xác nhận mua</span>
+      <span *ngIf="loading">Đang xử lý...</span>
+    </button>
+  </div>
+</div>

@@ -108,7 +108,7 @@ export class HomeComponent {
 
   private navigateByRole(user: AuthRes): void {
     if (user.role === 'ADMIN') {
-      this.router.navigate(['/app/admin/company']);
+      this.router.navigate(['/app/admin/product-management']);
       return;
     }
     if (user.role === 'SALE_PARENT' || user.role === 'SALE_CHILD') {

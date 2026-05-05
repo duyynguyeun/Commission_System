@@ -8,6 +8,12 @@
     <div class="sidebar-menu">
       <div class="menu-group" *ngIf="isAdmin()">
         <p class="menu-title">ADMIN</p>
+        <a routerLink="/app/admin/product-management" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-package'></i> Quan ly san pham
+        </a>
+        <a routerLink="/app/admin/user-management" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-user'></i> Quan ly nguoi dung
+        </a>
         <a routerLink="/app/admin/products" routerLinkActive="active" class="menu-item">
           <i class='bx bx-cube'></i> Doanh thu sản phẩm
         </a>
@@ -29,6 +35,13 @@
         </a>
         <a routerLink="/app/sale/overview" routerLinkActive="active" class="menu-item">
           <i class='bx bx-line-chart'></i> Doanh số
+        </a>
+      </div>
+
+      <div class="menu-group" *ngIf="isCustomer()">
+        <p class="menu-title">TÀI KHOẢN</p>
+        <a routerLink="/app/products" routerLinkActive="active" class="menu-item">
+          <i class='bx bx-shopping-bag'></i> Sản phẩm
         </a>
       </div>
     </div>

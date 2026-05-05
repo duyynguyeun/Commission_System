@@ -67,10 +67,12 @@ export class RegisterDialogComponent implements OnInit {
         this.auth.saveUser(user);
         this.dialogRef.close();
         if (user.role === 'ADMIN') {
-          this.router.navigate(['/app/admin/company']);
-          return;
+          this.router.navigate(['/app/admin/product-management']);
+        } else if (user.role === 'CUSTOMER') {
+          this.router.navigate(['/app/products']);
+        } else {
+          this.router.navigate(['/app/sale/overview']);
         }
-        this.router.navigate(['/app/sale/overview']);
       },
       error: () => this.error = 'Đăng ký thất bại'
     });

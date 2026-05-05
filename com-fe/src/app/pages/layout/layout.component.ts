@@ -36,8 +36,12 @@ export class LayoutComponent {
     return this.user?.role === 'SALE_PARENT' || this.user?.role === 'SALE_CHILD';
   }
 
+  isCustomer(): boolean {
+    return this.user?.role === 'CUSTOMER';
+  }
+
   logout(): void {
     this.auth.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 }

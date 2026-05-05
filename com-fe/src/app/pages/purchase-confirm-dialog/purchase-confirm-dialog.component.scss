@@ -1,0 +1,141 @@
+.product-summary {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #e5e7eb;
+
+  .img-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    i {
+      font-size: 24px;
+      color: #9ca3af;
+    }
+  }
+
+  .info {
+    flex: 1;
+
+    .name {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      color: #1f2937;
+    }
+
+    .price {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ea580c;
+    }
+  }
+}
+
+.purchase-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  label {
+    font-size: 14px;
+    color: #4b5563;
+    font-weight: 500;
+  }
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+
+  button {
+    background: #f9fafb;
+    border: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #e5e7eb;
+    }
+
+    &:disabled {
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+
+  input {
+    width: 40px;
+    height: 32px;
+    border: none;
+    border-left: 1px solid #d1d5db;
+    border-right: 1px solid #d1d5db;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0;
+    
+    &[readonly] {
+      background: white;
+      color: #111827;
+    }
+
+    /* Remove arrows */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+.total-row {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+  
+  label {
+    font-size: 15px;
+    color: #111827;
+  }
+}
+
+.total-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ea580c;
+}
+
+.btn-primary:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}

@@ -28,6 +28,43 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface PageResponse<T> {
+  pagination: PageMeta;
+  data: T[];
+}
+
+export interface PageMeta {
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stockQuantity: number;
+  urlImage: string;
+  description: string;
+  createAt: string;
+  updateAt: string;
+}
+
+export interface ProductReq {
+  name: string;
+  price: number;
+  stockQuantity: number;
+  urlImage?: string;
+  description?: string;
+}
+
+export interface CustomerOrderReq {
+  totalPrice: number;
+  status: 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCEL';
+  customerId: number;
+}
+
 export interface SaleHistoryItem {
   orderDetailId: number;
   productId: number;
@@ -61,6 +98,46 @@ export interface AdminEmployeeRevenue {
   employeeName: string;
   salesRevenue: number;
   totalCommission: number;
+}
+
+export interface Employee {
+  id: number;
+  parentId?: number | null;
+  fullName: string;
+  createAt: string;
+  updateAt: string;
+  accountId: number;
+  username: string;
+  role: 'SALE_PARENT' | 'SALE_CHILD' | 'ADMIN';
+}
+
+export interface Customer {
+  id: number;
+  fullName: string;
+  dob: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+  accountId: number;
+  username: string;
+  role: 'CUSTOMER';
+}
+
+export interface EmployeeReq {
+  parentId?: number | null;
+  username: string;
+  password: string;
+  fullName: string;
+  role: 'SALE_PARENT' | 'SALE_CHILD' | 'ADMIN';
+}
+
+export interface CustomerReq {
+  username: string;
+  password: string;
+  fullName: string;
+  dob: string;
+  address: string;
+  role: 'CUSTOMER';
 }
 
 export interface OrderDetailReq {

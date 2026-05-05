@@ -1,0 +1,49 @@
+<div class="page-container" *ngIf="product && !loading">
+  <div class="breadcrumb">
+    <a routerLink="/app/products"><i class='bx bx-arrow-back'></i> Quay lại danh sách</a>
+  </div>
+
+  <div class="product-detail-card">
+    <div class="product-image-section">
+      <img [src]="product.urlImage || 'assets/placeholder-product.png'" [alt]="product.name" (error)="product.urlImage = ''">
+      <div class="fallback-img" *ngIf="!product.urlImage">
+        <i class='bx bx-image'></i>
+      </div>
+    </div>
+    
+    <div class="product-info-section">
+      <h1 class="title">{{product.name}}</h1>
+      <p class="price">{{product.price | number:'1.0-0'}} đ</p>
+      
+      <div class="meta-info">
+        <div class="meta-item">
+          <i class='bx bx-box'></i>
+          <span>Kho: {{product.stockQuantity}}</span>
+        </div>
+      </div>
+
+      <div class="description">
+        <h3>Mô tả sản phẩm</h3>
+        <p>{{product.description || 'Chưa có mô tả cho sản phẩm này.'}}</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary buy-btn" (click)="buyNow()" [disabled]="product.stockQuantity <= 0">
+          <i class='bx bx-cart'></i>
+          Mua ngay
+        </button>
+        <p class="out-of-stock" *ngIf="product.stockQuantity <= 0">Sản phẩm đã hết hàng</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  Đang tải chi tiết sản phẩm...
+</div>
+
+<div class="empty-state" *ngIf="!loading && !product">
+  <i class='bx bx-error-circle'></i>
+  <p>Không tìm thấy sản phẩm</p>
+  <a routerLink="/app/products" class="btn-secondary">Quay lại danh sách</a>
+</div>
