@@ -1,11 +1,64 @@
-<section>
-  <h1>Admin doanh thu tung nhan vien</h1>
-  <table *ngIf="data.length">
-    <thead><tr><th>EmployeeId</th><th>Ten</th><th>Doanh thu ban</th><th>Tong hoa hong</th></tr></thead>
-    <tbody>
-      <tr *ngFor="let item of data">
-        <td>{{item.employeeId}}</td><td>{{item.employeeName}}</td><td>{{item.salesRevenue | number}}</td><td>{{item.totalCommission | number}}</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
+<div class="revenue-container">
+  <div class="header-section">
+    <div class="title-wrapper">
+      <h1>Doanh thu nhân viên</h1>
+      <p class="subtitle">Thống kê doanh số bán hàng và hoa hồng của từng nhân viên</p>
+    </div>
+    <button class="btn-refresh" (click)="loadData()">
+      <i class='bx bx-refresh'></i> Làm mới
+    </button>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stats-card">
+      <div class="icon-box orange"><i class='bx bx-line-chart'></i></div>
+      <div class="stats-info">
+        <span class="label">Tổng doanh số</span>
+        <h3 class="value">{{ totalSales | number }} đ</h3>
+      </div>
+    </div>
+    <div class="stats-card">
+      <div class="icon-box green"><i class='bx bx-wallet'></i></div>
+      <div class="stats-info">
+        <span class="label">Tổng hoa hồng đã chi</span>
+        <h3 class="value">{{ totalCommission | number }} đ</h3>
+      </div>
+    </div>
+    <div class="stats-card">
+      <div class="icon-box blue"><i class='bx bx-group'></i></div>
+      <div class="stats-info">
+        <span class="label">Số lượng nhân viên</span>
+        <h3 class="value">{{ data.length }} người</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-card">
+    <ag-grid-angular
+      style="width: 100%; height: 500px;"
+      class="ag-theme-alpine"
+      [rowData]="data"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [pagination]="true"
+      [paginationPageSize]="pageSize"
+      [suppressPaginationPanel]="true"
+      (gridReady)="onGridReady($event)"
+    >
+    </ag-grid-angular>
+
+    <div class="pagination-bar" *ngIf="totalRecords > 0">
+      <span class="pg-info"><b>{{ (currentPage-1)*pageSize+1 }}-{{ Math.min(currentPage*pageSize, totalRecords) }}</b> của <b>{{ totalRecords }}</b> kết quả</span>
+      <div class="pg-controls">
+        <button class="pg-btn nav-btn" [disabled]="currentPage===1" (click)="goToPage(1)"><i class='bx bx-chevrons-left'></i></button>
+        <button class="pg-btn nav-btn" [disabled]="currentPage===1" (click)="goToPage(currentPage-1)"><i class='bx bx-chevron-left'></i></button>
+        <ng-container *ngFor="let p of getPages()">
+          <button *ngIf="p !== '...'" class="pg-btn" [class.active]="p===currentPage" (click)="goToPage(+p)">{{ p }}</button>
+          <span *ngIf="p === '...'" class="pg-dots">...</span>
+        </ng-container>
+        <button class="pg-btn nav-btn" [disabled]="currentPage===totalPages" (click)="goToPage(currentPage+1)"><i class='bx bx-chevron-right'></i></button>
+        <button class="pg-btn nav-btn" [disabled]="currentPage===totalPages" (click)="goToPage(totalPages)"><i class='bx bx-chevrons-right'></i></button>
+      </div>
+    </div>
+  </div>
+</div>

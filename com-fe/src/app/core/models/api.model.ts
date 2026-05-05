@@ -119,6 +119,7 @@ export interface AdminProductRevenue {
 export interface AdminEmployeeRevenue {
   employeeId: number;
   employeeName: string;
+  role: string;
   salesRevenue: number;
   totalCommission: number;
 }
