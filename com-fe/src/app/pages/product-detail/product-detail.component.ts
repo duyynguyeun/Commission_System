@@ -13,6 +13,7 @@ import { PurchaseConfirmDialogComponent } from '../purchase-confirm-dialog/purch
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null;
   loading = false;
+  affiliateLinkId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -22,8 +23,21 @@ export class ProductDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    const affCode = this.route.snapshot.queryParamMap.get('aff');
+
     if (id) {
       this.loadProduct(Number(id));
+    }
+
+    const finalAffCode = affCode || sessionStorage.getItem('aff_code');
+    if (finalAffCode) {
+      this.api.trackAffiliateCode(finalAffCode).subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.affiliateLinkId = res.data.id;
+          }
+        }
+      });
     }
   }
 
@@ -45,7 +59,10 @@ export class ProductDetailComponent implements OnInit {
     
     const dialogRef = this.dialog.open(PurchaseConfirmDialogComponent, {
       width: '450px',
-      data: { product: this.product }
+      data: { 
+        product: this.product,
+        affiliateLinkId: this.affiliateLinkId 
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

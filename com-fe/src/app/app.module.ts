@@ -25,6 +25,8 @@ import { ProductDetailComponent } from './pages/product-detail/product-detail.co
 import { PurchaseConfirmDialogComponent } from './pages/purchase-confirm-dialog/purchase-confirm-dialog.component';
 import { AdminProductCrudComponent } from './pages/admin-product-crud/admin-product-crud.component';
 import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.component';
+import { SaleProductListComponent } from './pages/sale-product-list/sale-product-list.component';
+import { AffiliateLinkDialogComponent } from './pages/affiliate-link-dialog/affiliate-link-dialog.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.
     ProductDetailComponent,
     PurchaseConfirmDialogComponent,
     AdminProductCrudComponent,
-    AdminUserCrudComponent
+    AdminUserCrudComponent,
+    SaleProductListComponent,
+    AffiliateLinkDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -60,6 +64,6 @@ import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [RegisterDialogComponent, LoginComponent]
+  entryComponents: [RegisterDialogComponent, LoginComponent, AffiliateLinkDialogComponent]
 })
 export class AppModule { }

@@ -124,6 +124,16 @@ export interface AdminEmployeeRevenue {
   totalCommission: number;
 }
 
+export interface SaleProduct {
+  id: number;
+  name: string;
+  price: number;
+  maxCommissionRate: number;
+  maxCommissionAmount: number;
+  urlImage: string;
+}
+
+
 export interface Employee {
   id: number;
   parentId?: number | null;
@@ -172,4 +182,18 @@ export interface OrderDetailReq {
   sellerId: number | null;
   parentId?: number | null;
   affiliateLinkId: number | null;
+}
+
+export interface AffiliateLinkRenderReq {
+  productId: number;
+}
+
+export interface AffiliateLinkRes {
+  id: number;
+  affCode: string;
+  affUrl: string;
+  productId: number;
+  employeeId: number;
+  createAt: string;
+  updateAt: string;
 }

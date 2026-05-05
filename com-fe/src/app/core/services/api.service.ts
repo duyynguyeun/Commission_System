@@ -16,7 +16,10 @@ import {
   Product,
   ProductReq,
   SaleHistoryItem,
-  SaleOverview
+  SaleOverview,
+  SaleProduct,
+  AffiliateLinkRenderReq,
+  AffiliateLinkRes
 } from '../models/api.model';
 
 @Injectable({ providedIn: 'root' })
@@ -51,6 +54,10 @@ export class ApiService {
 
   getProducts(page: number = 0, size: number = 20): Observable<ApiResponse<PageResponse<Product>>> {
     return this.http.get<ApiResponse<PageResponse<Product>>>(`${this.base}/products?page=${page}&size=${size}`);
+  }
+
+  getSaleProducts(page: number = 0, size: number = 20): Observable<ApiResponse<PageResponse<SaleProduct>>> {
+    return this.http.get<ApiResponse<PageResponse<SaleProduct>>>(`${this.base}/products/sale?page=${page}&size=${size}`);
   }
 
   createProduct(payload: ProductReq): Observable<ApiResponse<Product>> {
@@ -99,5 +106,13 @@ export class ApiService {
 
   createCustomerOrder(payload: CustomerOrderReq): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.base}/orders`, payload);
+  }
+
+  renderAffiliateLink(payload: AffiliateLinkRenderReq): Observable<ApiResponse<AffiliateLinkRes>> {
+    return this.http.post<ApiResponse<AffiliateLinkRes>>(`${this.base}/affiliate-links/render`, payload);
+  }
+
+  trackAffiliateCode(affCode: string): Observable<ApiResponse<AffiliateLinkRes>> {
+    return this.http.get<ApiResponse<AffiliateLinkRes>>(`${this.base}/affiliate-links/track/${affCode}`);
   }
 }

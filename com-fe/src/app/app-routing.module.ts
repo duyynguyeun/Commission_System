@@ -13,6 +13,7 @@ import { ProductListComponent } from './pages/product-list/product-list.componen
 import { ProductDetailComponent } from './pages/product-detail/product-detail.component';
 import { AdminProductCrudComponent } from './pages/admin-product-crud/admin-product-crud.component';
 import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.component';
+import { SaleProductListComponent } from './pages/sale-product-list/sale-product-list.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -21,7 +22,7 @@ const routes: Routes = [
     component: LayoutComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: 'order-detail', component: OrderDetailCreateComponent },
+      { path: 'sale-products', component: SaleProductListComponent },
       { path: 'sale/history', component: SaleHistoryComponent },
       { path: 'sale/overview', component: SaleOverviewComponent },
       { path: 'admin/product-management', component: AdminProductCrudComponent },

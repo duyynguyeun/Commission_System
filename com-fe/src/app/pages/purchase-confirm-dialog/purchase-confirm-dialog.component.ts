@@ -16,7 +16,7 @@ export class PurchaseConfirmDialogComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<PurchaseConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { product: Product },
+    @Inject(MAT_DIALOG_DATA) public data: { product: Product, affiliateLinkId: number | null },
     private api: ApiService,
     private auth: AuthService
   ) {}
@@ -70,8 +70,8 @@ export class PurchaseConfirmDialogComponent implements OnInit {
           quantity: this.quantity,
           customerOrderId: customerOrderId,
           productId: this.data.product.id,
-          sellerId: null, // Direct purchase
-          affiliateLinkId: null // No affiliate link
+          sellerId: null, 
+          affiliateLinkId: this.data.affiliateLinkId
         }).subscribe({
           next: () => {
             this.loading = false;
