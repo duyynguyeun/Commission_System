@@ -24,6 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final AccountRepository accountRepository;
     private final EmployeeMapper employeeMapper;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Override
     public EmployeeResDTO create(EmployeeReqDTO reqDTO) {
@@ -31,6 +32,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new BusinessException(ErrorCode.EMPLOYEE_002);
         }
         Employee employee = employeeMapper.toEntity(reqDTO);
+        employee.getAccount().setPassword(passwordEncoder.encode(reqDTO.getPassword()));
         employee.setCreateAt(Instant.now());
         employee.setUpdateAt(Instant.now());
         employee.getAccount().setCreateAt(Instant.now());
@@ -61,5 +63,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Page<EmployeeResDTO> findAll(Pageable pageable) {
         return employeeRepository.findAll(pageable).map(employeeMapper::toResponse);
+    }
+
+    @Override
+    public java.util.List<EmployeeResDTO> findByRole(com.comission.system.enums.EmployeeEnum role) {
+        return employeeRepository.findByAccount_Role(role).stream()
+                .map(employeeMapper::toResponse)
+                .toList();
     }
 }

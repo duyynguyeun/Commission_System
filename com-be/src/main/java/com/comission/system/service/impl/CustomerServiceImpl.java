@@ -24,6 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
     private final CustomerMapper customerMapper;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Override
     public CustomerResDTO create(CustomerReqDTO reqDTO) {
@@ -31,6 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new BusinessException(ErrorCode.CUSTOMER_002);
         }
         Customer customer = customerMapper.toEntity(reqDTO);
+        customer.getAccount().setPassword(passwordEncoder.encode(reqDTO.getPassword()));
         customer.setCreateAt(Instant.now());
         customer.setUpdateAt(Instant.now());
         customer.getAccount().setCreateAt(Instant.now());

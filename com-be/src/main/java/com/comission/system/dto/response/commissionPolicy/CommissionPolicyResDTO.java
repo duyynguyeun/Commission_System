@@ -18,6 +18,8 @@ public class CommissionPolicyResDTO {
     private BigDecimal parentRate;
     private BigDecimal childRate;
     private Long productId;
+    private String productName;
+    private BigDecimal productPrice;
     private Instant createAt;
     private Instant updateAt;
 }

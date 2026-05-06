@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/employees/role/**").permitAll()
                         .requestMatchers("/api/reports/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/reports/sales/**", "/api/order-details/**").hasAnyRole("ADMIN", "SALE_PARENT", "SALE_CHILD", "CUSTOMER")
                         .anyRequest().authenticated())

@@ -39,4 +39,9 @@ public class EmployeeController {
         Page<EmployeeResDTO> data = employeeService.findAll(pageable);
         return ApiResponse.success(new PageResponse<>(data));
     }
+
+    @GetMapping("/role/{role}")
+    public ApiResponse<java.util.List<EmployeeResDTO>> findByRole(@PathVariable com.comission.system.enums.EmployeeEnum role) {
+        return ApiResponse.success(employeeService.findByRole(role));
+    }
 }

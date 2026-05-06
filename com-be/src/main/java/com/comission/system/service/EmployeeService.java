@@ -10,4 +10,5 @@ public interface EmployeeService {
     EmployeeResDTO update(Long id, EmployeeReqDTO reqDTO);
     void delete(Long id);
     Page<EmployeeResDTO> findAll(Pageable pageable);
+    java.util.List<EmployeeResDTO> findByRole(com.comission.system.enums.EmployeeEnum role);
 }
