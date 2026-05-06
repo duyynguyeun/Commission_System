@@ -21,7 +21,8 @@ import {
   AffiliateLinkRenderReq,
   AffiliateLinkRes,
   CommissionPolicy,
-  CommissionPolicyReq
+  CommissionPolicyReq,
+  AdminCompanyRevenue
 } from '../models/api.model';
 
 @Injectable({ providedIn: 'root' })
@@ -42,8 +43,8 @@ export class ApiService {
     return this.http.get<ApiResponse<AdminProductRevenue[]>>(`${this.base}/reports/admin/products/revenue`);
   }
 
-  getAdminCompanyRevenue(): Observable<ApiResponse<number>> {
-    return this.http.get<ApiResponse<number>>(`${this.base}/reports/admin/company/revenue`);
+  getAdminCompanyRevenue(): Observable<ApiResponse<AdminCompanyRevenue>> {
+    return this.http.get<ApiResponse<AdminCompanyRevenue>>(`${this.base}/reports/admin/company/revenue`);
   }
 
   getAdminEmployeeRevenue(): Observable<ApiResponse<AdminEmployeeRevenue[]>> {

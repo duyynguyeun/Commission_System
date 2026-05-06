@@ -124,6 +124,14 @@ export interface AdminEmployeeRevenue {
   totalCommission: number;
 }
 
+export interface AdminCompanyRevenue {
+  totalSalesRevenue: number;
+  directSalesRevenue: number;
+  affiliateSalesRevenue: number;
+  totalCommissionPaid: number;
+  netCompanyRevenue: number;
+}
+
 export interface SaleProduct {
   id: number;
   name: string;

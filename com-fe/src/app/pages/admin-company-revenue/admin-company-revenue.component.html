@@ -1,4 +1,79 @@
-<section>
-  <h1>Admin doanh thu cong ty</h1>
-  <div class="card">Tong doanh thu: {{revenue | number}}</div>
+<section class="revenue-dashboard">
+  <div class="header">
+    <h1>Báo cáo doanh thu công ty</h1>
+    <p class="subtitle">Tổng quan các chỉ số tài chính và hiệu quả kinh doanh</p>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <i class='bx bx-loader-alt bx-spin'></i>
+    <span>Đang tải dữ liệu...</span>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!loading">
+    <!-- Main Revenue Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card main-card">
+        <div class="card-icon"><i class='bx bx-money'></i></div>
+        <div class="card-info">
+          <span class="label">Tổng doanh thu bán hàng</span>
+          <h2 class="value">{{ revenue.totalSalesRevenue | number }}đ</h2>
+          <p class="desc">Bao gồm bán trực tiếp và qua Sale</p>
+        </div>
+      </div>
+
+      <div class="metric-card net-card">
+        <div class="card-icon"><i class='bx bx-wallet'></i></div>
+        <div class="card-info">
+          <span class="label">Lợi nhuận thực tế công ty</span>
+          <h2 class="value">{{ revenue.netCompanyRevenue | number }}đ</h2>
+          <p class="desc">Doanh thu sau khi trừ hoa hồng Sale</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary Metrics -->
+    <div class="secondary-grid">
+      <div class="info-card">
+        <div class="info-header">
+          <i class='bx bx-user'></i>
+          <span>Bán hàng trực tiếp</span>
+        </div>
+        <div class="info-body">
+          <h3>{{ revenue.directSalesRevenue | number }}đ</h3>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="(revenue.directSalesRevenue / revenue.totalSalesRevenue) * 100"></div>
+          </div>
+          <span class="percentage">{{ (revenue.directSalesRevenue / revenue.totalSalesRevenue) | percent:'1.1-1' }}</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <i class='bx bx-group'></i>
+          <span>Bán hàng qua Sale</span>
+        </div>
+        <div class="info-body">
+          <h3>{{ revenue.affiliateSalesRevenue | number }}đ</h3>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="(revenue.affiliateSalesRevenue / revenue.totalSalesRevenue) * 100"></div>
+          </div>
+          <span class="percentage">{{ (revenue.affiliateSalesRevenue / revenue.totalSalesRevenue) | percent:'1.1-1' }}</span>
+        </div>
+      </div>
+
+      <div class="info-card warning">
+        <div class="info-header">
+          <i class='bx bx-minus-circle'></i>
+          <span>Tổng hoa hồng chi trả</span>
+        </div>
+        <div class="info-body">
+          <h3>{{ revenue.totalCommissionPaid | number }}đ</h3>
+          <div class="progress-bar">
+            <div class="progress red" [style.width.%]="(revenue.totalCommissionPaid / revenue.totalSalesRevenue) * 100"></div>
+          </div>
+          <span class="percentage">{{ (revenue.totalCommissionPaid / revenue.totalSalesRevenue) | percent:'1.1-1' }} (trên doanh thu)</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
