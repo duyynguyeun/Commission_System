@@ -1,6 +1,7 @@
 package com.comission.system.controller;
 
 import com.comission.system.dto.response.ApiResponse;
+import com.comission.system.dto.response.report.AdminCompanyRevenueResDTO;
 import com.comission.system.dto.response.report.AdminEmployeeRevenueResDTO;
 import com.comission.system.dto.response.report.AdminProductRevenueResDTO;
 import com.comission.system.dto.response.report.SaleHistoryResDTO;
@@ -34,7 +35,7 @@ public class ReportController {
     }
 
     @GetMapping("/admin/company/revenue")
-    public ApiResponse<BigDecimal> companyRevenue() {
+    public ApiResponse<AdminCompanyRevenueResDTO> companyRevenue() {
         return ApiResponse.success(reportService.getCompanyRevenue());
     }
 

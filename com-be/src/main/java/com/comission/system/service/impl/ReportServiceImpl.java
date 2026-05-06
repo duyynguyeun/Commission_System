@@ -1,5 +1,6 @@
 package com.comission.system.service.impl;
 
+import com.comission.system.dto.response.report.AdminCompanyRevenueResDTO;
 import com.comission.system.dto.response.report.AdminEmployeeRevenueResDTO;
 import com.comission.system.dto.response.report.AdminProductRevenueResDTO;
 import com.comission.system.dto.response.report.SaleHistoryResDTO;
@@ -155,10 +156,35 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public BigDecimal getCompanyRevenue() {
-        return orderDetailRepository.findAll().stream()
+    public AdminCompanyRevenueResDTO getCompanyRevenue() {
+        List<OrderDetail> allOrders = orderDetailRepository.findAll();
+        List<CommissionTransaction> allTxs = commissionTransactionRepository.findAll();
+
+        BigDecimal totalSalesRevenue = allOrders.stream()
                 .map(this::lineRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal directSalesRevenue = allOrders.stream()
+                .filter(o -> o.getSeller() == null)
+                .map(this::lineRevenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal affiliateSalesRevenue = allOrders.stream()
+                .filter(o -> o.getSeller() != null)
+                .map(this::lineRevenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalCommissionPaid = allTxs.stream()
+                .map(CommissionTransaction::getCommissionAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return AdminCompanyRevenueResDTO.builder()
+                .totalSalesRevenue(totalSalesRevenue)
+                .directSalesRevenue(directSalesRevenue)
+                .affiliateSalesRevenue(affiliateSalesRevenue)
+                .totalCommissionPaid(totalCommissionPaid)
+                .netCompanyRevenue(totalSalesRevenue.subtract(totalCommissionPaid))
+                .build();
     }
 
     @Override

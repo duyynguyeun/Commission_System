@@ -1,5 +1,6 @@
 package com.comission.system.service;
 
+import com.comission.system.dto.response.report.AdminCompanyRevenueResDTO;
 import com.comission.system.dto.response.report.AdminEmployeeRevenueResDTO;
 import com.comission.system.dto.response.report.AdminProductRevenueResDTO;
 import com.comission.system.dto.response.report.SaleHistoryResDTO;
@@ -12,6 +13,6 @@ public interface ReportService {
     List<SaleHistoryResDTO> getSaleHistory(Long employeeId);
     SaleOverviewResDTO getSaleOverview(Long employeeId);
     List<AdminProductRevenueResDTO> getProductRevenue();
-    BigDecimal getCompanyRevenue();
+    AdminCompanyRevenueResDTO getCompanyRevenue();
     List<AdminEmployeeRevenueResDTO> getEmployeeRevenue();
 }
