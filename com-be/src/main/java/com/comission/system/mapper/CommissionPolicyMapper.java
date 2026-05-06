@@ -15,6 +15,8 @@ public interface CommissionPolicyMapper {
     CommissionPolicy toEntity(CommissionPolicyReqDTO req);
 
     @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.name", target = "productName")
+    @Mapping(source = "product.price", target = "productPrice")
     CommissionPolicyResDTO toResponse(CommissionPolicy commissionPolicy);
 
     @Mapping(source = "productId", target = "product.id")

@@ -10,6 +10,7 @@ import com.comission.system.mapper.CommissionPolicyMapper;
 import com.comission.system.repository.CommissionPolicyRepository;
 import com.comission.system.service.CommissionPolicyService;
 import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommissionPolicyServiceImpl implements CommissionPolicyService {
     private final CommissionPolicyRepository commissionPolicyRepository;
