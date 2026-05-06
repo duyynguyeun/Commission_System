@@ -29,11 +29,13 @@
             <option value="CUSTOMER">Khách hàng</option>
           </select>
         </div>
-        <div class="dialog-form-group full-width">
+        <div class="dialog-form-group full-width" *ngIf="roleControl?.value === 'SALE_CHILD'">
           <label>Sale quản lý <span style="font-weight: 400; color: #9ca3af;">(dành cho Sale cấp 2)</span></label>
-          <input type="number" formControlName="parentId" placeholder="Chọn Sale quản lý" />
+          <select formControlName="parentId">
+            <option [value]="null">-- Chọn Sale quản lý --</option>
+            <option *ngFor="let p of parents" [value]="p.id">{{p.fullName}}</option>
+          </select>
           <small class="field-error" *ngIf="parentIdControl?.touched && parentIdControl?.hasError('required')">Vui lòng chọn Sale quản lý</small>
-          <small class="field-error" *ngIf="parentIdControl?.touched && parentIdControl?.hasError('min')">Parent ID phải lớn hơn 0</small>
         </div>
       </div>
       <p class="dialog-error">{{error}}</p>

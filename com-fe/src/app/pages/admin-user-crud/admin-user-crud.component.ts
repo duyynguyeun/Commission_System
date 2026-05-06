@@ -30,6 +30,7 @@ export class AdminUserCrudComponent implements OnInit {
   loading = false;
   saving = false;
   message = '';
+  parents: Employee[] = [];
   searchTerm = '';
   roleFilter = 'ALL';
   gridApi!: GridApi;
@@ -90,7 +91,17 @@ export class AdminUserCrudComponent implements OnInit {
   ];
 
   constructor(private api: ApiService) {}
-  ngOnInit(): void { this.loadUsers(); }
+  ngOnInit(): void {
+    this.loadUsers();
+    this.loadParents();
+  }
+
+  loadParents(): void {
+    this.api.getEmployeesByRole('SALE_PARENT').subscribe({
+      next: r => this.parents = r.data || [],
+      error: () => console.error('Failed to fetch parents')
+    });
+  }
 
   onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;

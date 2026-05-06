@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { RegisterReq } from '../../core/models/api.model';
+import { ApiService } from '../../core/services/api.service';
+import { RegisterReq, Employee } from '../../core/models/api.model';
 
 @Component({
   selector: 'app-register-dialog',
@@ -13,15 +14,22 @@ import { RegisterReq } from '../../core/models/api.model';
 export class RegisterDialogComponent implements OnInit {
   registerForm!: FormGroup;
   error = '';
+  parents: Employee[] = [];
 
   constructor(
     private dialogRef: MatDialogRef<RegisterDialogComponent>,
     private auth: AuthService,
+    private apiService: ApiService,
     private router: Router,
     private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.apiService.getEmployeesByRole('SALE_PARENT').subscribe({
+      next: (res) => this.parents = res.data,
+      error: () => console.error('Failed to fetch parents')
+    });
+
     this.registerForm = this.fb.group({
       fullName: ['', [Validators.required]],
       username: ['', [Validators.required]],

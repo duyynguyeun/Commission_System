@@ -19,7 +19,9 @@ import {
   SaleOverview,
   SaleProduct,
   AffiliateLinkRenderReq,
-  AffiliateLinkRes
+  AffiliateLinkRes,
+  CommissionPolicy,
+  CommissionPolicyReq
 } from '../models/api.model';
 
 @Injectable({ providedIn: 'root' })
@@ -88,6 +90,10 @@ export class ApiService {
     return this.http.delete<ApiResponse<void>>(`${this.base}/employees/${id}`);
   }
 
+  getEmployeesByRole(role: string): Observable<ApiResponse<Employee[]>> {
+    return this.http.get<ApiResponse<Employee[]>>(`${this.base}/employees/role/${role}`);
+  }
+
   getCustomers(page: number = 0, size: number = 20): Observable<ApiResponse<PageResponse<Customer>>> {
     return this.http.get<ApiResponse<PageResponse<Customer>>>(`${this.base}/customers?page=${page}&size=${size}`);
   }
@@ -114,5 +120,13 @@ export class ApiService {
 
   trackAffiliateCode(affCode: string): Observable<ApiResponse<AffiliateLinkRes>> {
     return this.http.get<ApiResponse<AffiliateLinkRes>>(`${this.base}/affiliate-links/track/${affCode}`);
+  }
+
+  getCommissionPolicies(page: number = 0, size: number = 1000): Observable<ApiResponse<PageResponse<CommissionPolicy>>> {
+    return this.http.get<ApiResponse<PageResponse<CommissionPolicy>>>(`${this.base}/policy?page=${page}&size=${size}`);
+  }
+
+  updateCommissionPolicy(id: number, payload: CommissionPolicyReq): Observable<ApiResponse<CommissionPolicy>> {
+    return this.http.post<ApiResponse<CommissionPolicy>>(`${this.base}/policy/${id}`, payload);
   }
 }

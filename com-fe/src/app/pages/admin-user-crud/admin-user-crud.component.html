@@ -18,7 +18,13 @@
         <div class="form-group"><label>Tên đăng nhập <span class="req">*</span></label><input [(ngModel)]="form.username" placeholder="Nhập username" /></div>
         <div class="form-group"><label>Mật khẩu <span class="req">*</span></label><input [(ngModel)]="form.password" type="password" placeholder="Nhập mật khẩu" /></div>
         <div class="form-group"><label>Họ và tên <span class="req">*</span></label><input [(ngModel)]="form.fullName" placeholder="Nhập họ và tên" /></div>
-        <div class="form-group" *ngIf="form.role === 'SALE_CHILD'"><label>Parent ID <span class="req">*</span></label><input [(ngModel)]="form.parentId" type="number" min="1" placeholder="Nhập parent ID" /></div>
+        <div class="form-group" *ngIf="form.role === 'SALE_CHILD'">
+          <label>Sale quản lý <span class="req">*</span></label>
+          <select [(ngModel)]="form.parentId">
+            <option [value]="null">-- Chọn Sale quản lý --</option>
+            <option *ngFor="let p of parents" [value]="p.id">{{p.fullName}}</option>
+          </select>
+        </div>
         <div class="form-group" *ngIf="form.role === 'CUSTOMER'"><label>Ngày sinh <span class="req">*</span></label><input [(ngModel)]="form.dob" type="date" /></div>
         <div class="form-group full-width" *ngIf="form.role === 'CUSTOMER'"><label>Địa chỉ <span class="req">*</span></label><textarea [(ngModel)]="form.address" rows="3" placeholder="Nhập địa chỉ"></textarea></div>
       </div>
