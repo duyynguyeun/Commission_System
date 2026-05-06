@@ -22,5 +22,6 @@ public class SaleHistoryResDTO {
     private EmployeeEnum commissionRole;
     private BigDecimal commissionRate;
     private BigDecimal commissionAmount;
+    private String sellerName;
     private Instant transactionAt;
 }

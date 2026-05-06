@@ -1,16 +1,67 @@
-<section>
-  <h1>Sale lich su ban</h1>
-  <div class="toolbar">
-    <input type="number" [(ngModel)]="employeeId" placeholder="ID nhân viên" />
-    <button (click)="load()">Tải dữ liệu</button>
+<section class="admin-crud-page">
+  <div class="page-shell">
+    <div class="page-header">
+      <h1>Lịch sử bán hàng</h1>
+      <p class="subtitle">Xem lại danh sách các đơn hàng đã được ghi nhận</p>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+      <div class="table-top">
+        <span class="record-count">{{ totalRecords }} giao dịch</span>
+        <div class="search-box">
+          <i class='bx bx-search'></i>
+          <input [(ngModel)]="searchTerm" placeholder="Tìm kiếm sản phẩm, người giới thiệu..." (input)="onSearch()" />
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="loading-block">
+        <i class='bx bx-loader-alt bx-spin'></i>
+        Đang tải...
+      </div>
+
+      <div *ngIf="!loading">
+        <ag-grid-angular
+          class="ag-theme-alpine admin-grid"
+          [style.width]="'100%'"
+          [style.height]="gridHeight"
+          [rowData]="filteredData"
+          [columnDefs]="columnDefs"
+          [pagination]="true"
+          [paginationPageSize]="pageSize"
+          [suppressPaginationPanel]="true"
+          [rowHeight]="52"
+          [headerHeight]="44"
+          [suppressCellSelection]="true"
+          (gridReady)="onGridReady($event)"
+        ></ag-grid-angular>
+
+        <div class="pagination-bar" *ngIf="totalPages > 1">
+          <span class="pg-info">
+            Đang hiển thị <b>{{ (currentPage-1)*pageSize+1 }}-{{ Math.min(currentPage*pageSize, totalRecords) }}</b> của <b>{{ totalRecords }}</b> kết quả
+          </span>
+          <div class="pg-controls">
+            <button class="pg-btn nav-btn" [disabled]="currentPage===1" (click)="goToPage(1)">
+              <i class='bx bx-chevrons-left'></i>
+            </button>
+            <button class="pg-btn nav-btn" [disabled]="currentPage===1" (click)="goToPage(currentPage-1)">
+              <i class='bx bx-chevron-left'></i>
+            </button>
+            
+            <ng-container *ngFor="let p of getPages()">
+              <button *ngIf="p !== '...'" class="pg-btn" [class.active]="p===currentPage" (click)="goToPage(+p)">{{ p }}</button>
+              <span *ngIf="p === '...'" class="pg-dots">...</span>
+            </ng-container>
+
+            <button class="pg-btn nav-btn" [disabled]="currentPage===totalPages" (click)="goToPage(currentPage+1)">
+              <i class='bx bx-chevron-right'></i>
+            </button>
+            <button class="pg-btn nav-btn" [disabled]="currentPage===totalPages" (click)="goToPage(totalPages)">
+              <i class='bx bx-chevrons-right'></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <table *ngIf="data.length">
-    <thead><tr><th>OrderDetail</th><th>San pham</th><th>SL</th><th>Doanh thu dong</th><th>Role</th><th>Ty le</th><th>Hoa hong</th></tr></thead>
-    <tbody>
-      <tr *ngFor="let item of data">
-        <td>{{item.orderDetailId}}</td><td>{{item.productName}}</td><td>{{item.quantity}}</td>
-        <td>{{item.lineRevenue | number}}</td><td>{{item.commissionRole}}</td><td>{{item.commissionRate}}%</td><td>{{item.commissionAmount | number}}</td>
-      </tr>
-    </tbody>
-  </table>
 </section>

@@ -95,6 +95,7 @@ export interface SaleHistoryItem {
   commissionRole: string;
   commissionRate: number;
   commissionAmount: number;
+  sellerName: string;
   transactionAt: string;
 }
 

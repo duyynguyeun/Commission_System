@@ -51,6 +51,7 @@ public class ReportServiceImpl implements ReportService {
                         .commissionRole(tx.getCommissionRole())
                         .commissionRate(tx.getCommissionRate())
                         .commissionAmount(tx.getCommissionAmount())
+                        .sellerName(tx.getOrderDetail().getSeller() != null ? tx.getOrderDetail().getSeller().getFullName() : "Trực tiếp")
                         .transactionAt(tx.getCreateAt())
                         .build())
                 .toList();
