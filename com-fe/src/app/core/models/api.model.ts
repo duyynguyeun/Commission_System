@@ -74,28 +74,9 @@ export interface SaleHistoryItem {
   commissionRole: string;
   commissionRate: number;
   commissionAmount: number;
-  transactionAt: string;
-}
-
-export interface SaleOverview {
-  employeeId: number;
-  ownRevenue: number;
-  ownCommission: number;
-  totalPrice: number;
-  status: 'PENDING' | 'PAID' | 'COMPLETED' | 'CANCEL';
-  customerId: number;
-}
-
-export interface SaleHistoryItem {
-  orderDetailId: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  lineRevenue: number;
-  commissionRole: string;
-  commissionRate: number;
-  commissionAmount: number;
   sellerName: string;
+  relatedCommissionRate: number | null;
+  relatedCommissionAmount: number | null;
   transactionAt: string;
 }
 
@@ -107,6 +88,8 @@ export interface SaleOverview {
   relatedLevelCommission: number;
   totalRevenue: number;
   totalCommission: number;
+  ownCommissionFromOwnSales: number;
+  ownCommissionFromChildSales: number;
 }
 
 export interface AdminProductRevenue {
@@ -141,7 +124,6 @@ export interface SaleProduct {
   maxCommissionAmount: number;
   urlImage: string;
 }
-
 
 export interface Employee {
   id: number;

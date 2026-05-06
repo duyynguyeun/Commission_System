@@ -1,15 +1,110 @@
-<section>
-  <h1>Sale doanh so</h1>
-  <div class="toolbar">
-    <input type="number" [(ngModel)]="employeeId" placeholder="Nhập ID nhân viên" />
-    <button (click)="load()">Tải dữ liệu</button>
+<section class="sale-overview">
+  <div class="header">
+    <h1>Báo cáo doanh số Sale</h1>
+    <p class="subtitle">Tổng quan các chỉ số kinh doanh và thu nhập cá nhân</p>
   </div>
-  <div *ngIf="data" class="grid">
-    <div>Own revenue: {{data.ownRevenue | number}}</div>
-    <div>Own commission: {{data.ownCommission | number}}</div>
-    <div>Related level revenue: {{data.relatedLevelRevenue | number}}</div>
-    <div>Related level commission: {{data.relatedLevelCommission | number}}</div>
-    <div>Total revenue: {{data.totalRevenue | number}}</div>
-    <div>Total commission: {{data.totalCommission | number}}</div>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <i class='bx bx-loader-alt bx-spin'></i>
+    <span>Đang tải dữ liệu...</span>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!loading && data">
+    <!-- CASE: SALE PARENT -->
+    <ng-container *ngIf="userRole === 'SALE_PARENT'">
+      <div class="metrics-grid">
+        <div class="metric-card main-card">
+          <div class="card-icon"><i class='bx bx-line-chart'></i></div>
+          <div class="card-info">
+            <span class="label">TỔNG DOANH SỐ HỆ THỐNG</span>
+            <h2 class="value">{{ data.totalRevenue | number }}đ</h2>
+            <p class="desc">Bao gồm doanh số cá nhân và toàn bộ sale con</p>
+          </div>
+        </div>
+
+        <div class="metric-card net-card">
+          <div class="card-icon"><i class='bx bx-wallet'></i></div>
+          <div class="card-info">
+            <span class="label">TỔNG THU NHẬP THỰC TẾ</span>
+            <h2 class="value">{{ data.ownCommission | number }}đ</h2>
+            <p class="desc">Tổng hoa hồng nhận được từ toàn hệ thống</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="secondary-grid">
+        <div class="info-card">
+          <div class="info-header">
+            <i class='bx bx-user'></i>
+            <span>Doanh số cá nhân</span>
+          </div>
+          <div class="info-body">
+            <h3>{{ data.ownRevenue | number }}đ</h3>
+            <p class="info-text">Hóa đơn do bạn trực tiếp bán</p>
+            <div class="visual-bar gray"></div>
+          </div>
+        </div>
+
+        <div class="info-card info-blue">
+          <div class="info-header">
+            <i class='bx bx-group'></i>
+            <span>Doanh số đội ngũ</span>
+          </div>
+          <div class="info-body">
+            <h3>{{ data.relatedLevelRevenue | number }}đ</h3>
+            <p class="info-text">Hóa đơn từ các sale con</p>
+            <div class="visual-bar blue"></div>
+          </div>
+        </div>
+
+        <!-- NEW METRICS -->
+        <div class="info-card info-green">
+          <div class="info-header">
+            <i class='bx bx-user-check'></i>
+            <span>Hoa hồng cá nhân</span>
+          </div>
+          <div class="info-body">
+            <h3>{{ data.ownCommissionFromOwnSales | number }}đ</h3>
+            <p class="info-text">Hoa hồng từ các đơn bạn tự bán</p>
+            <div class="visual-bar green"></div>
+          </div>
+        </div>
+
+        <div class="info-card info-purple">
+          <div class="info-header">
+            <i class='bx bx-share-alt'></i>
+            <span>Hoa hồng từ sale con</span>
+          </div>
+          <div class="info-body">
+            <h3>{{ data.ownCommissionFromChildSales | number }}đ</h3>
+            <p class="info-text">Hoa hồng từ đội ngũ đóng góp</p>
+            <div class="visual-bar purple"></div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- CASE: SALE CHILD -->
+    <ng-container *ngIf="userRole === 'SALE_CHILD'">
+      <div class="metrics-grid">
+        <div class="metric-card main-card">
+          <div class="card-icon"><i class='bx bx-shopping-bag'></i></div>
+          <div class="card-info">
+            <span class="label">TỔNG DOANH SỐ BÁN HÀNG</span>
+            <h2 class="value">{{ data.ownRevenue | number }}đ</h2>
+            <p class="desc">Giá trị các đơn hàng bạn đã bán</p>
+          </div>
+        </div>
+
+        <div class="metric-card net-card">
+          <div class="card-icon"><i class='bx bx-wallet'></i></div>
+          <div class="card-info">
+            <span class="label">TỔNG HOA HỒNG NHẬN ĐƯỢC</span>
+            <h2 class="value">{{ data.ownCommission | number }}đ</h2>
+            <p class="desc">Thu nhập thực tế bạn nhận được</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </section>

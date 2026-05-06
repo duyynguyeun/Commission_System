@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -53,6 +54,7 @@ import { AdminCommissionPolicyComponent } from './pages/admin-commission-policy/
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     BrowserAnimationsModule,
     MatDialogModule,
     MatButtonModule,
@@ -60,12 +62,17 @@ import { AdminCommissionPolicyComponent } from './pages/admin-commission-policy/
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    AgGridModule
+    AgGridModule.withComponents([])
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent],
-  entryComponents: [RegisterDialogComponent, LoginComponent, AffiliateLinkDialogComponent]
+  entryComponents: [
+    RegisterDialogComponent, 
+    LoginComponent, 
+    AffiliateLinkDialogComponent, 
+    PurchaseConfirmDialogComponent
+  ]
 })
 export class AppModule { }

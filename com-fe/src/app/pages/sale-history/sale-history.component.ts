@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common';
 })
 export class SaleHistoryComponent implements OnInit {
   employeeId = 0;
+  userRole = '';
   historyData: SaleHistoryItem[] = [];
   filteredData: SaleHistoryItem[] = [];
   loading = false;
@@ -26,31 +27,10 @@ export class SaleHistoryComponent implements OnInit {
   totalRecords = 0;
   Math = Math;
 
-  columnDefs: ColDef[] = [
-    {
-      headerName: 'STT', width: 70, sortable: false, filter: false,
-      valueGetter: 'node.rowIndex + 1',
-      cellClass: 'cell-center', headerClass: 'header-center'
-    },
-    { field: 'productName', headerName: 'Tên sản phẩm', flex: 1.5, minWidth: 200, cellClass: 'cell-name' },
-    { field: 'quantity', headerName: 'Số lượng', width: 100, cellClass: 'cell-center', headerClass: 'header-center' },
-    {
-      field: 'lineRevenue', headerName: 'Tổng tiền', width: 150, cellClass: 'cell-price',
-      valueFormatter: params => this.formatCurrency(params.value)
-    },
-    {
-      field: 'commissionAmount', headerName: 'Hoa hồng nhận', width: 150, cellClass: 'cell-commission',
-      valueFormatter: params => this.formatCurrency(params.value)
-    },
-    { field: 'sellerName', headerName: 'Người giới thiệu', width: 180, cellClass: 'cell-seller' },
-    {
-      field: 'transactionAt', headerName: 'Thời gian', width: 180,
-      valueFormatter: params => this.formatDate(params.value)
-    }
-  ];
+  columnDefs: ColDef[] = [];
 
   constructor(
-    private api: ApiService, 
+    private api: ApiService,
     private auth: AuthService,
     private datePipe: DatePipe
   ) {}
@@ -58,7 +38,66 @@ export class SaleHistoryComponent implements OnInit {
   ngOnInit(): void {
     const user = this.auth.getUser();
     this.employeeId = user?.userId || 0;
+    this.userRole = user?.role || '';
+    this.buildColumns();
     this.loadHistory();
+  }
+
+  buildColumns(): void {
+    const cols: ColDef[] = [
+      {
+        headerName: 'STT', width: 70, sortable: false, filter: false,
+        valueGetter: 'node.rowIndex + 1',
+        cellClass: 'cell-center', headerClass: 'header-center'
+      },
+      { field: 'productName', headerName: 'Tên sản phẩm', flex: 1.5, minWidth: 180, cellClass: 'cell-name' },
+      { field: 'quantity', headerName: 'Số lượng', width: 90, cellClass: 'cell-center', headerClass: 'header-center' },
+      {
+        field: 'lineRevenue', headerName: 'Tổng tiền', width: 140, cellClass: 'cell-price',
+        valueFormatter: params => this.formatCurrency(params.value)
+      },
+      {
+        field: 'commissionAmount', headerName: 'Hoa hồng nhận', width: 150, cellClass: 'cell-commission',
+        cellRenderer: (params: any) => {
+          const rate = params.data?.commissionRate;
+          const amount = params.value;
+          return `<span class="commission-cell own">${this.formatCurrency(amount)} <small>(${rate}%)</small></span>`;
+        }
+      }
+    ];
+
+    // Dynamic column based on role
+    if (this.userRole === 'SALE_CHILD') {
+      cols.push({
+        headerName: 'HH Sale cấp 1', width: 170, cellClass: 'cell-related',
+        cellRenderer: (params: any) => {
+          const rate = params.data?.relatedCommissionRate;
+          const amount = params.data?.relatedCommissionAmount;
+          if (rate == null || amount == null) return '<span class="no-data">—</span>';
+          return `<span class="commission-cell parent">${this.formatCurrency(amount)} <small>(${rate}%)</small></span>`;
+        }
+      });
+    } else if (this.userRole === 'SALE_PARENT') {
+      cols.push({
+        headerName: 'HH Sale cấp 2', width: 170, cellClass: 'cell-related',
+        cellRenderer: (params: any) => {
+          const rate = params.data?.relatedCommissionRate;
+          const amount = params.data?.relatedCommissionAmount;
+          if (rate == null || amount == null) return '<span class="no-data">—</span>';
+          return `<span class="commission-cell child">${this.formatCurrency(amount)} <small>(${rate}%)</small></span>`;
+        }
+      });
+    }
+
+    cols.push(
+      { field: 'sellerName', headerName: 'Người bán', width: 160, cellClass: 'cell-seller' },
+      {
+        field: 'transactionAt', headerName: 'Thời gian', width: 170,
+        valueFormatter: params => this.formatDate(params.value)
+      }
+    );
+
+    this.columnDefs = cols;
   }
 
   onGridReady(params: GridReadyEvent): void {

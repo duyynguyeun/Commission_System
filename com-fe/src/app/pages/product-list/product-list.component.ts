@@ -27,12 +27,6 @@ export class ProductListComponent implements OnInit {
       cellStyle: { textAlign: 'center', fontWeight: '500' },
       headerClass: 'custom-header-center'
     },
-    { 
-      field: 'id', 
-      headerName: 'MÃ SẢN PHẨM', 
-      width: 150, 
-      cellStyle: { color: '#3b82f6', fontWeight: '500' } // Blue text like image
-    },
     { field: 'name', headerName: 'TÊN SẢN PHẨM', flex: 1 },
     { 
       field: 'price', 
