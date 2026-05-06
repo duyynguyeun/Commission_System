@@ -1,0 +1,74 @@
+<section class="admin-crud-page">
+  <div class="page-shell">
+    <div class="page-header">
+      <h1>Điều chỉnh hoa hồng</h1>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-top">
+        <span class="record-count">{{ totalRecords }} chính sách</span>
+        <div class="search-box"><i class='bx bx-search'></i><input [(ngModel)]="searchTerm" placeholder="Tìm kiếm sản phẩm..." (input)="onSearch()" /></div>
+      </div>
+      <div *ngIf="loading" class="loading-block"><i class='bx bx-loader-alt bx-spin'></i> Đang tải...</div>
+      <div *ngIf="!loading">
+        <ag-grid-angular class="ag-theme-alpine admin-grid" [style.width]="'100%'" [style.height]="gridHeight"
+          [rowData]="filteredRows" [columnDefs]="columnDefs" [pagination]="true" [paginationPageSize]="pageSize"
+          [suppressPaginationPanel]="true" [rowHeight]="52" [headerHeight]="44" [suppressCellSelection]="true"
+          (gridReady)="onGridReady($event)" (cellClicked)="onActionClick($event)"></ag-grid-angular>
+        <div class="pagination-bar" *ngIf="totalPages > 1">
+          <span class="pg-info"><b>{{ (currentPage-1)*pageSize+1 }}-{{ Math.min(currentPage*pageSize, totalRecords) }}</b> của <b>{{ totalRecords }}</b> kết quả</span>
+          <div class="pg-controls">
+            <button class="pg-btn nav-btn" [disabled]="currentPage===1" (click)="goToPage(1)"><i class='bx bx-chevrons-left'></i></button>
+            <button class="pg-btn nav-btn" [disabled]="currentPage===1" (click)="goToPage(currentPage-1)"><i class='bx bx-chevron-left'></i></button>
+            <ng-container *ngFor="let p of getPages()">
+              <button *ngIf="p !== '...'" class="pg-btn" [class.active]="p===currentPage" (click)="goToPage(+p)">{{ p }}</button>
+              <span *ngIf="p === '...'" class="pg-dots">...</span>
+            </ng-container>
+            <button class="pg-btn nav-btn" [disabled]="currentPage===totalPages" (click)="goToPage(currentPage+1)"><i class='bx bx-chevron-right'></i></button>
+            <button class="pg-btn nav-btn" [disabled]="currentPage===totalPages" (click)="goToPage(totalPages)"><i class='bx bx-chevrons-right'></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT POPUP OVERLAY -->
+  <div class="popup-overlay" *ngIf="showEditPopup" (click)="closeEditPopup()">
+    <div class="popup-card" (click)="$event.stopPropagation()">
+      <div class="popup-header">
+        <h3>Chỉnh sửa chính sách hoa hồng</h3>
+        <button class="btn-close-popup" (click)="closeEditPopup()"><i class='bx bx-x'></i></button>
+      </div>
+      <div class="popup-body">
+        <div class="popup-form-group">
+          <label>Tên sản phẩm</label>
+          <input type="text" [value]="editingRow?.productName" disabled class="input-disabled" />
+        </div>
+        <div class="popup-form-group">
+          <label>Tỷ lệ hoa hồng công ty (%) <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="editForm.companyRate" min="0" max="100" step="1" />
+        </div>
+        <div class="popup-form-group">
+          <label>Tỷ lệ hoa hồng Sale cấp 1 (%) <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="editForm.parentRate" min="0" max="100" step="1" />
+        </div>
+        <div class="popup-form-group">
+          <label>Tỷ lệ hoa hồng Sale cấp 2 (%) <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="editForm.childRate" min="0" max="100" step="1" />
+        </div>
+        <div class="popup-msg" *ngIf="editMessage">{{ editMessage }}</div>
+      </div>
+      <div class="popup-actions">
+        <button class="btn-cancel" (click)="closeEditPopup()">Hủy bỏ</button>
+        <button class="btn-submit" [disabled]="saving" (click)="submitEdit()">{{ saving ? 'Đang lưu...' : 'Lưu lại' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" *ngIf="toastMessage" [class.toast-error]="toastType==='error'">
+    <i class='bx' [ngClass]="toastType==='error' ? 'bx-error-circle' : 'bx-check-circle'"></i>
+    {{ toastMessage }}
+  </div>
+</section>

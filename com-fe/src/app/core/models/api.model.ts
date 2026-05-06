@@ -197,3 +197,22 @@ export interface AffiliateLinkRes {
   createAt: string;
   updateAt: string;
 }
+
+export interface CommissionPolicy {
+  id: number;
+  companyRate: number;
+  parentRate: number;
+  childRate: number;
+  productId: number;
+  productName: string;
+  productPrice: number;
+  createAt: string;
+  updateAt: string;
+}
+
+export interface CommissionPolicyReq {
+  companyRate: number;
+  parentRate: number;
+  childRate: number;
+  productId: number;
+}

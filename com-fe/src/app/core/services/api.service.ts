@@ -129,4 +129,8 @@ export class ApiService {
   updateCommissionPolicy(id: number, payload: CommissionPolicyReq): Observable<ApiResponse<CommissionPolicy>> {
     return this.http.post<ApiResponse<CommissionPolicy>>(`${this.base}/policy/${id}`, payload);
   }
+
+  createCommissionPolicy(payload: CommissionPolicyReq): Observable<ApiResponse<CommissionPolicy>> {
+    return this.http.post<ApiResponse<CommissionPolicy>>(`${this.base}/policy`, payload);
+  }
 }

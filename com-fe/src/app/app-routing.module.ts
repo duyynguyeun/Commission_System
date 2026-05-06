@@ -14,6 +14,7 @@ import { ProductDetailComponent } from './pages/product-detail/product-detail.co
 import { AdminProductCrudComponent } from './pages/admin-product-crud/admin-product-crud.component';
 import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.component';
 import { SaleProductListComponent } from './pages/sale-product-list/sale-product-list.component';
+import { AdminCommissionPolicyComponent } from './pages/admin-commission-policy/admin-commission-policy.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -30,6 +31,7 @@ const routes: Routes = [
       { path: 'admin/products', component: AdminProductRevenueComponent },
       { path: 'admin/company', component: AdminCompanyRevenueComponent },
       { path: 'admin/employees', component: AdminEmployeeRevenueComponent },
+      { path: 'admin/commission-policy', component: AdminCommissionPolicyComponent },
       { path: 'products', component: ProductListComponent },
       { path: 'products/:id', component: ProductDetailComponent },
       { path: '', redirectTo: 'products', pathMatch: 'full' }
