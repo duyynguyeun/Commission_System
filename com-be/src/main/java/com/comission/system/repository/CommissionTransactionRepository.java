@@ -11,5 +11,6 @@ import java.util.List;
 public interface CommissionTransactionRepository extends JpaRepository<CommissionTransaction, Long> {
     List<CommissionTransaction> findByEmployee_Id(Long employeeId);
     List<CommissionTransaction> findByOrderDetail_IdIn(List<Long> orderDetailIds);
+    List<CommissionTransaction> findByOrderDetail_Id(Long orderDetailId);
     boolean existsByOrderDetail_IdAndCommissionRole(Long orderDetailId, EmployeeEnum commissionRole);
 }

@@ -42,19 +42,34 @@ public class ReportServiceImpl implements ReportService {
     public List<SaleHistoryResDTO> getSaleHistory(Long employeeId) {
         ensureEmployeeExists(employeeId);
         List<CommissionTransaction> txs = commissionTransactionRepository.findByEmployee_Id(employeeId);
-        return txs.stream().map(tx -> SaleHistoryResDTO.builder()
-                        .orderDetailId(tx.getOrderDetail().getId())
-                        .productId(tx.getOrderDetail().getProduct().getId())
-                        .productName(tx.getOrderDetail().getProduct().getName())
-                        .quantity(tx.getOrderDetail().getQuantity())
-                        .lineRevenue(lineRevenue(tx.getOrderDetail()))
-                        .commissionRole(tx.getCommissionRole())
-                        .commissionRate(tx.getCommissionRate())
-                        .commissionAmount(tx.getCommissionAmount())
-                        .sellerName(tx.getOrderDetail().getSeller() != null ? tx.getOrderDetail().getSeller().getFullName() : "Trực tiếp")
-                        .transactionAt(tx.getCreateAt())
-                        .build())
-                .toList();
+        return txs.stream().map(tx -> {
+            // Find the other party's commission on the same order detail
+            BigDecimal relatedRate = null;
+            BigDecimal relatedAmount = null;
+            List<CommissionTransaction> siblingTxs = commissionTransactionRepository.findByOrderDetail_Id(tx.getOrderDetail().getId());
+            for (CommissionTransaction sibling : siblingTxs) {
+                if (!sibling.getId().equals(tx.getId())) {
+                    relatedRate = sibling.getCommissionRate();
+                    relatedAmount = sibling.getCommissionAmount();
+                    break;
+                }
+            }
+
+            return SaleHistoryResDTO.builder()
+                    .orderDetailId(tx.getOrderDetail().getId())
+                    .productId(tx.getOrderDetail().getProduct().getId())
+                    .productName(tx.getOrderDetail().getProduct().getName())
+                    .quantity(tx.getOrderDetail().getQuantity())
+                    .lineRevenue(lineRevenue(tx.getOrderDetail()))
+                    .commissionRole(tx.getCommissionRole())
+                    .commissionRate(tx.getCommissionRate())
+                    .commissionAmount(tx.getCommissionAmount())
+                    .sellerName(tx.getOrderDetail().getSeller() != null ? tx.getOrderDetail().getSeller().getFullName() : "Trực tiếp")
+                    .relatedCommissionRate(relatedRate)
+                    .relatedCommissionAmount(relatedAmount)
+                    .transactionAt(tx.getCreateAt())
+                    .build();
+        }).toList();
     }
 
     @Override
@@ -115,6 +130,18 @@ public class ReportServiceImpl implements ReportService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
+        BigDecimal ownCommissionFromOwnSales = ownTx.stream()
+                .filter(tx -> tx.getEmployee() != null && employeeId.equals(tx.getEmployee().getId()))
+                .filter(tx -> tx.getOrderDetail().getSeller() != null && employeeId.equals(tx.getOrderDetail().getSeller().getId()))
+                .map(CommissionTransaction::getCommissionAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal ownCommissionFromChildSales = ownTx.stream()
+                .filter(tx -> tx.getEmployee() != null && employeeId.equals(tx.getEmployee().getId()))
+                .filter(tx -> tx.getOrderDetail().getSeller() != null && !employeeId.equals(tx.getOrderDetail().getSeller().getId()))
+                .map(CommissionTransaction::getCommissionAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return SaleOverviewResDTO.builder()
                 .employeeId(employeeId)
                 .ownRevenue(ownRevenue)
@@ -123,6 +150,8 @@ public class ReportServiceImpl implements ReportService {
                 .relatedLevelCommission(relatedLevelCommission)
                 .totalRevenue(ownRevenue.add(relatedLevelRevenue))
                 .totalCommission(ownCommission.add(relatedLevelCommission))
+                .ownCommissionFromOwnSales(ownCommissionFromOwnSales)
+                .ownCommissionFromChildSales(ownCommissionFromChildSales)
                 .build();
     }
 

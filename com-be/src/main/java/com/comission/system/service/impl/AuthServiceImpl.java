@@ -24,8 +24,10 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final AccountRepository accountRepository;
@@ -65,7 +67,6 @@ public class AuthServiceImpl implements AuthService {
                 .createAt(Instant.now())
                 .updateAt(Instant.now())
                 .build();
-        accountRepository.save(account);
 
         Long userId;
         if (reqDTO.getRole() == EmployeeEnum.CUSTOMER) {

@@ -23,5 +23,7 @@ public class SaleHistoryResDTO {
     private BigDecimal commissionRate;
     private BigDecimal commissionAmount;
     private String sellerName;
+    private BigDecimal relatedCommissionRate;
+    private BigDecimal relatedCommissionAmount;
     private Instant transactionAt;
 }

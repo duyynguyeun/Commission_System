@@ -3,6 +3,7 @@ package com.comission.system.service.impl;
 import com.comission.system.dto.request.orderDetail.OrderDetailReqDTO;
 import com.comission.system.dto.response.orderDetail.OrderDetailResDTO;
 import com.comission.system.entity.*;
+import com.comission.system.enums.EmployeeEnum;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.mapper.OrderDetailMapper;
@@ -136,28 +137,46 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         if (policy == null) return;
 
         BigDecimal totalPrice = orderDetail.getPrice().multiply(BigDecimal.valueOf(orderDetail.getQuantity()));
+        Employee seller = orderDetail.getSeller();
+        EmployeeEnum sellerRole = seller.getAccount() != null ? seller.getAccount().getRole() : null;
 
-        // 1. Commission for Seller (Child rate)
-        if (policy.getChildRate() != null && policy.getChildRate().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal sellerAmount = totalPrice.multiply(policy.getChildRate()).divide(BigDecimal.valueOf(100));
-            saveTransaction(orderDetail.getSeller(), orderDetail, sellerAmount, policy.getChildRate());
-        }
+        if (sellerRole == EmployeeEnum.SALE_CHILD) {
+            // --- Case 1: Affiliate link belongs to a SALE_CHILD ---
+            // Child gets childRate
+            if (policy.getChildRate() != null && policy.getChildRate().compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal childAmount = totalPrice.multiply(policy.getChildRate()).divide(BigDecimal.valueOf(100));
+                saveTransaction(seller, orderDetail, childAmount, policy.getChildRate(), EmployeeEnum.SALE_CHILD, policy);
+            }
+            // Parent gets parentRate
+            if (orderDetail.getParent() != null && policy.getParentRate() != null && policy.getParentRate().compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal parentAmount = totalPrice.multiply(policy.getParentRate()).divide(BigDecimal.valueOf(100));
+                saveTransaction(orderDetail.getParent(), orderDetail, parentAmount, policy.getParentRate(), EmployeeEnum.SALE_PARENT, policy);
+            }
+        } else if (sellerRole == EmployeeEnum.SALE_PARENT) {
+            // --- Case 2: Affiliate link belongs to a SALE_PARENT ---
+            // Parent gets parentRate + childRate (total sale commission)
+            BigDecimal parentRate = policy.getParentRate() != null ? policy.getParentRate() : BigDecimal.ZERO;
+            BigDecimal childRate = policy.getChildRate() != null ? policy.getChildRate() : BigDecimal.ZERO;
+            BigDecimal combinedRate = parentRate.add(childRate);
 
-        // 2. Commission for Parent (Parent rate)
-        if (orderDetail.getParent() != null && policy.getParentRate() != null && policy.getParentRate().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal parentAmount = totalPrice.multiply(policy.getParentRate()).divide(BigDecimal.valueOf(100));
-            saveTransaction(orderDetail.getParent(), orderDetail, parentAmount, policy.getParentRate());
+            if (combinedRate.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal combinedAmount = totalPrice.multiply(combinedRate).divide(BigDecimal.valueOf(100));
+                saveTransaction(seller, orderDetail, combinedAmount, combinedRate, EmployeeEnum.SALE_PARENT, policy);
+            }
         }
     }
 
-    private void saveTransaction(Employee employee, OrderDetail orderDetail, BigDecimal amount, BigDecimal rate) {
+    private void saveTransaction(Employee employee, OrderDetail orderDetail, BigDecimal amount, BigDecimal rate, EmployeeEnum role, CommissionPolicy policy) {
         CommissionTransaction transaction = CommissionTransaction.builder()
                 .employee(employee)
                 .orderDetail(orderDetail)
+                .commissionPolicy(policy)
                 .commissionAmount(amount)
                 .commissionRate(rate)
+                .commissionRole(role)
                 .createAt(Instant.now())
                 .build();
         commissionTransactionRepository.save(transaction);
     }
 }
+

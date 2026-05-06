@@ -19,4 +19,8 @@ public class SaleOverviewResDTO {
     private BigDecimal relatedLevelCommission;
     private BigDecimal totalRevenue;
     private BigDecimal totalCommission;
+    
+    // Phân tách hoa hồng cho Sale Parent
+    private BigDecimal ownCommissionFromOwnSales;
+    private BigDecimal ownCommissionFromChildSales;
 }
