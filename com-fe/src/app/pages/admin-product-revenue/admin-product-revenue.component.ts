@@ -13,8 +13,8 @@ export class AdminProductRevenueComponent implements OnInit {
   
   columnDefs: ColDef[] = [
     { 
-      field: 'productId', 
-      headerName: 'ID', 
+      valueGetter: 'node.rowIndex + 1',
+      headerName: 'STT', 
       width: 80,
       cellStyle: { fontWeight: 'bold', color: '#666' }
     },
