@@ -22,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AffiliateLinkController {
     private final AffiliateLinkService affiliateLinkService;
-
     @PostMapping
     public ApiResponse<AffiliateLinkResDTO> create(@Valid @RequestBody AffiliateLinkReqDTO reqDTO) {
         return ApiResponse.success(affiliateLinkService.create(reqDTO));

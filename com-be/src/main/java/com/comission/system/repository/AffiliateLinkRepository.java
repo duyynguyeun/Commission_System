@@ -13,4 +13,6 @@ public interface AffiliateLinkRepository extends JpaRepository<AffiliateLink, Lo
     Optional<AffiliateLink> findByAffCode(String affCode);
     Optional<AffiliateLink> findByEmployee_IdAndProduct_Id(Long employeeId, Long productId);
     List<AffiliateLink> findByEmployee_Id(Long employeeId);
+    boolean existsByEmployee_Id(Long employeeId);
+    boolean existsByProduct_Id(Long productId);
 }

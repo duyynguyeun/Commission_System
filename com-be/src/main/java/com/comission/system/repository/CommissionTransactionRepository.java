@@ -13,4 +13,6 @@ public interface CommissionTransactionRepository extends JpaRepository<Commissio
     List<CommissionTransaction> findByOrderDetail_IdIn(List<Long> orderDetailIds);
     List<CommissionTransaction> findByOrderDetail_Id(Long orderDetailId);
     boolean existsByOrderDetail_IdAndCommissionRole(Long orderDetailId, EmployeeEnum commissionRole);
+    boolean existsByEmployee_Id(Long employeeId);
+    boolean existsByCommissionPolicy_Id(Long policyId);
 }

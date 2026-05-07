@@ -6,8 +6,7 @@ import com.comission.system.entity.Employee;
 import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.mapper.EmployeeMapper;
-import com.comission.system.repository.AccountRepository;
-import com.comission.system.repository.EmployeeRepository;
+import com.comission.system.repository.*;
 import com.comission.system.service.EmployeeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,9 @@ import java.time.Instant;
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final AccountRepository accountRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final AffiliateLinkRepository affiliateLinkRepository;
+    private final CommissionTransactionRepository commissionTransactionRepository;
     private final EmployeeMapper employeeMapper;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
@@ -57,6 +59,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!employeeRepository.existsById(id)) {
             throw new BusinessException(ErrorCode.EMPLOYEE_001);
         }
+
+        // Kiểm tra xem có dữ liệu liên quan không
+        boolean hasOrders = orderDetailRepository.existsBySeller_Id(id) || orderDetailRepository.existsByParent_Id(id);
+        boolean hasLinks = affiliateLinkRepository.existsByEmployee_Id(id);
+        boolean hasTransactions = commissionTransactionRepository.existsByEmployee_Id(id);
+        boolean isParent = employeeRepository.existsByParentId(id);
+
+        if (hasOrders || hasLinks || hasTransactions || isParent) {
+            throw new BusinessException(ErrorCode.EMPLOYEE_003);
+        }
+
         employeeRepository.deleteById(id);
     }
 

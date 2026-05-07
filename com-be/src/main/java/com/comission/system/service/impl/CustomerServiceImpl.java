@@ -7,6 +7,7 @@ import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.mapper.CustomerMapper;
 import com.comission.system.repository.AccountRepository;
+import com.comission.system.repository.CustomerOrderRepository;
 import com.comission.system.repository.CustomerRepository;
 import com.comission.system.service.CustomerService;
 import jakarta.transaction.Transactional;
@@ -23,6 +24,7 @@ import java.time.Instant;
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
+    private final CustomerOrderRepository customerOrderRepository;
     private final CustomerMapper customerMapper;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
@@ -57,6 +59,11 @@ public class CustomerServiceImpl implements CustomerService {
         if (!customerRepository.existsById(id)) {
             throw new BusinessException(ErrorCode.CUSTOMER_001);
         }
+
+        if (customerOrderRepository.existsByCustomer_Id(id)) {
+            throw new BusinessException(ErrorCode.CUSTOMER_003);
+        }
+
         customerRepository.deleteById(id);
     }
 

@@ -34,7 +34,6 @@ public class AffiliateLinkServiceImpl implements AffiliateLinkService {
     private final ProductRepository productRepository;
     private final AffiliateLinkMapper affiliateLinkMapper;
 
-    @Override
     public AffiliateLinkResDTO create(AffiliateLinkReqDTO reqDTO) {
         if (affiliateLinkRepository.existsByAffCode(reqDTO.getAffCode())) {
             throw new BusinessException(ErrorCode.LINK_002);
@@ -98,7 +97,6 @@ public class AffiliateLinkServiceImpl implements AffiliateLinkService {
         affiliateLinkRepository.save(link);
         return affiliateLinkMapper.toResponse(link);
     }
-
     @Override
     public List<AffiliateLinkResDTO> findMyLinks(Long saleId) {
         return affiliateLinkRepository.findByEmployee_Id(saleId)

@@ -10,4 +10,7 @@ import java.util.List;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     List<OrderDetail> findBySeller_IdOrParent_Id(Long sellerId, Long parentId);
     List<OrderDetail> findByCustomerOrder_Id(Long customerOrderId);
+    boolean existsByProduct_Id(Long productId);
+    boolean existsBySeller_Id(Long employeeId);
+    boolean existsByParent_Id(Long employeeId);
 }

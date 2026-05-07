@@ -2,10 +2,7 @@ package com.comission.system.service.impl;
 
 import com.comission.system.dto.request.customerOrder.CustomerOrderReqDTO;
 import com.comission.system.dto.response.customerOrder.CustomerOrderResDTO;
-import com.comission.system.entity.CommissionPolicy;
-import com.comission.system.entity.CommissionTransaction;
-import com.comission.system.entity.CustomerOrder;
-import com.comission.system.entity.OrderDetail;
+import com.comission.system.entity.*;
 import com.comission.system.enums.CommissionEnum;
 import com.comission.system.enums.EmployeeEnum;
 import com.comission.system.enums.OrderEnum;
@@ -77,10 +74,11 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         return customerOrderRepository.findAll(pageable).map(customerOrderMapper::toResponse);
     }
 
+    // Tạo hoa hồng cho toàn bộ các OrderDetail thuộc CustomerOder
     private void generateCommissions(Long orderId) {
         List<OrderDetail> details = orderDetailRepository.findByCustomerOrder_Id(orderId);
         for (OrderDetail detail : details) {
-            if (detail.getProduct() == null) {
+            if (detail.getProduct() == null || detail.getSeller() == null) {
                 continue;
             }
 
@@ -88,43 +86,52 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
                     .orElseThrow(() -> new BusinessException(ErrorCode.POLICY_002));
 
             BigDecimal gross = detail.getPrice().multiply(BigDecimal.valueOf(detail.getQuantity()));
-            createCommissionIfNeeded(detail, policy, gross, EmployeeEnum.SALE_CHILD);
-            createCommissionIfNeeded(detail, policy, gross, EmployeeEnum.SALE_PARENT);
+
+            // Lấy role của người bán
+            Employee seller = detail.getSeller();
+            EmployeeEnum sellerRole = (seller.getAccount() != null) ? seller.getAccount().getRole() : null;
+
+            if (sellerRole == EmployeeEnum.SALE_CHILD) {
+                // Case 1: Sale Child bán -> Child nhận childRate, Parent nhận parentRate
+                createCommissionIfNeeded(seller, detail, policy, gross, policy.getChildRate(), EmployeeEnum.SALE_CHILD);
+
+                if (detail.getParent() != null) {
+                    createCommissionIfNeeded(detail.getParent(), detail, policy, gross, policy.getParentRate(), EmployeeEnum.SALE_PARENT);
+                }
+            } else if (sellerRole == EmployeeEnum.SALE_PARENT) {
+                // Case 2: Sale Parent bán -> Parent nhận gộp (childRate + parentRate)
+                BigDecimal childRate = (policy.getChildRate() != null) ? policy.getChildRate() : BigDecimal.ZERO;
+                BigDecimal parentRate = (policy.getParentRate() != null) ? policy.getParentRate() : BigDecimal.ZERO;
+                BigDecimal combinedRate = childRate.add(parentRate);
+
+                createCommissionIfNeeded(seller, detail, policy, gross, combinedRate, EmployeeEnum.SALE_PARENT);
+            }
         }
     }
 
-    private void createCommissionIfNeeded(OrderDetail detail, CommissionPolicy policy, BigDecimal gross, EmployeeEnum role) {
+    // Kiểm tra xem sale đã được tính hoa hồng cho đơn hàng này hay chưa
+    private void createCommissionIfNeeded(Employee employee, OrderDetail detail, CommissionPolicy policy, BigDecimal gross, BigDecimal rate, EmployeeEnum role) {
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
         if (commissionTransactionRepository.existsByOrderDetail_IdAndCommissionRole(detail.getId(), role)) {
             return;
         }
 
-        if (role == EmployeeEnum.SALE_CHILD && detail.getSeller() != null) {
-            commissionTransactionRepository.save(CommissionTransaction.builder()
-                    .employee(detail.getSeller())
-                    .orderDetail(detail)
-                    .commissionPolicy(policy)
-                    .commissionRole(role)
-                    .commissionRate(policy.getChildRate())
-                    .commissionAmount(calcAmount(gross, policy.getChildRate()))
-                    .status(CommissionEnum.PENDING)
-                    .createAt(Instant.now())
-                    .build());
-        }
-
-        if (role == EmployeeEnum.SALE_PARENT && detail.getParent() != null) {
-            commissionTransactionRepository.save(CommissionTransaction.builder()
-                    .employee(detail.getParent())
-                    .orderDetail(detail)
-                    .commissionPolicy(policy)
-                    .commissionRole(role)
-                    .commissionRate(policy.getParentRate())
-                    .commissionAmount(calcAmount(gross, policy.getParentRate()))
-                    .status(CommissionEnum.PENDING)
-                    .createAt(Instant.now())
-                    .build());
-        }
+        commissionTransactionRepository.save(CommissionTransaction.builder()
+                .employee(employee)
+                .orderDetail(detail)
+                .commissionPolicy(policy)
+                .commissionRole(role)
+                .commissionRate(rate)
+                .commissionAmount(calcAmount(gross, rate))
+                .status(CommissionEnum.PENDING)
+                .createAt(Instant.now())
+                .build());
     }
 
+    // Tính làm tròn
     private BigDecimal calcAmount(BigDecimal gross, BigDecimal rate) {
         if (rate == null) {
             return BigDecimal.ZERO;

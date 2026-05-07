@@ -8,6 +8,7 @@ import com.comission.system.exception.ErrorCode;
 import com.comission.system.exception.NotFoundException;
 import com.comission.system.mapper.CommissionPolicyMapper;
 import com.comission.system.repository.CommissionPolicyRepository;
+import com.comission.system.repository.CommissionTransactionRepository;
 import com.comission.system.service.CommissionPolicyService;
 import lombok.RequiredArgsConstructor;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class CommissionPolicyServiceImpl implements CommissionPolicyService {
     private final CommissionPolicyRepository commissionPolicyRepository;
+    private final CommissionTransactionRepository commissionTransactionRepository;
     private static final Logger logger = LoggerFactory.getLogger(CommissionPolicyServiceImpl.class);
     private final CommissionPolicyMapper commissionPolicyMapper;
 
@@ -57,12 +59,15 @@ public class CommissionPolicyServiceImpl implements CommissionPolicyService {
     @Override
     public void delete(Long id) {
         logger.info("Delete policy id: {}", id);
-        if (commissionPolicyRepository.existsById(id)) {
-            commissionPolicyRepository.deleteById(id);
-        } else {
-            logger.info("Policy id not found: {}", id);
-            throw new NotFoundException(ErrorCode.POLICY_002);
+        if (!commissionPolicyRepository.existsById(id)) {
+            throw new BusinessException(ErrorCode.POLICY_002);
         }
+
+        if (commissionTransactionRepository.existsByCommissionPolicy_Id(id)) {
+            throw new BusinessException(ErrorCode.POLICY_003);
+        }
+
+        commissionPolicyRepository.deleteById(id);
     }
 
     @Override

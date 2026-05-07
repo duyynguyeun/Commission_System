@@ -12,4 +12,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByParentId(Long parentId);
     Optional<Employee> findByAccount_Id(Long accountId);
     List<Employee> findByAccount_Role(com.comission.system.enums.EmployeeEnum role);
+    boolean existsByParentId(Long parentId);
 }

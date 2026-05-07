@@ -46,18 +46,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return orderDetailMapper.toResponse(saved);
     }
 
-    private void deductStock(Long productId, Integer quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_001));
-        
-        if (product.getStockQuantity() < quantity) {
-            throw new BusinessException(ErrorCode.PRODUCT_003);
-        }
-        
-        product.setStockQuantity(product.getStockQuantity() - quantity);
-        productRepository.save(product);
-    }
-
     @Override
     public OrderDetailResDTO update(Long id, OrderDetailReqDTO reqDTO) {
         OrderDetail orderDetail = orderDetailRepository.findById(id)
@@ -82,6 +70,20 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return orderDetailRepository.findAll(pageable).map(orderDetailMapper::toResponse);
     }
 
+    // Tính số lượng hàng còn lại
+    private void deductStock(Long productId, Integer quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_001));
+
+        if (product.getStockQuantity() < quantity) {
+            throw new BusinessException(ErrorCode.PRODUCT_003);
+        }
+
+        product.setStockQuantity(product.getStockQuantity() - quantity);
+        productRepository.save(product);
+    }
+
+    // Xác định thêm thông tin về đơn hàng (thuộc afflink nào? thuộc seller nào? có parent hay không?)
     private void applyAffiliateHierarchy(OrderDetail orderDetail, OrderDetailReqDTO reqDTO) {
         AffiliateLink affiliateLink = resolveAffiliateLink(reqDTO);
         
@@ -106,6 +108,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
     }
 
+    // Lấy AffLink từ request
     private AffiliateLink resolveAffiliateLink(OrderDetailReqDTO reqDTO) {
         if (reqDTO.getAffCode() != null && !reqDTO.getAffCode().isBlank()) {
             return affiliateLinkRepository.findByAffCode(reqDTO.getAffCode())
@@ -120,6 +123,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return null;
     }
 
+    // Kiểm tra quan hệ giữa Sale_Parent và Sale_Child
     private void validateHierarchy(OrderDetail orderDetail) {
         if (orderDetail.getParent() != null
                 && orderDetail.getSeller() != null
@@ -129,6 +133,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
     }
 
+    // Tính hoa hồng mà sale nhận được tùy theo case
     private void calculateAndSaveCommissions(OrderDetail orderDetail) {
         if (orderDetail.getSeller() == null) return;
 
@@ -144,13 +149,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             // --- Case 1: Affiliate link belongs to a SALE_CHILD ---
             // Child gets childRate
             if (policy.getChildRate() != null && policy.getChildRate().compareTo(BigDecimal.ZERO) > 0) {
-                BigDecimal childAmount = totalPrice.multiply(policy.getChildRate()).divide(BigDecimal.valueOf(100));
-                saveTransaction(seller, orderDetail, childAmount, policy.getChildRate(), EmployeeEnum.SALE_CHILD, policy);
+                if (!commissionTransactionRepository.existsByOrderDetail_IdAndCommissionRole(orderDetail.getId(), EmployeeEnum.SALE_CHILD)) {
+                    BigDecimal childAmount = totalPrice.multiply(policy.getChildRate()).divide(BigDecimal.valueOf(100));
+                    saveTransaction(seller, orderDetail, childAmount, policy.getChildRate(), EmployeeEnum.SALE_CHILD, policy);
+                }
             }
             // Parent gets parentRate
             if (orderDetail.getParent() != null && policy.getParentRate() != null && policy.getParentRate().compareTo(BigDecimal.ZERO) > 0) {
-                BigDecimal parentAmount = totalPrice.multiply(policy.getParentRate()).divide(BigDecimal.valueOf(100));
-                saveTransaction(orderDetail.getParent(), orderDetail, parentAmount, policy.getParentRate(), EmployeeEnum.SALE_PARENT, policy);
+                if (!commissionTransactionRepository.existsByOrderDetail_IdAndCommissionRole(orderDetail.getId(), EmployeeEnum.SALE_PARENT)) {
+                    BigDecimal parentAmount = totalPrice.multiply(policy.getParentRate()).divide(BigDecimal.valueOf(100));
+                    saveTransaction(orderDetail.getParent(), orderDetail, parentAmount, policy.getParentRate(), EmployeeEnum.SALE_PARENT, policy);
+                }
             }
         } else if (sellerRole == EmployeeEnum.SALE_PARENT) {
             // --- Case 2: Affiliate link belongs to a SALE_PARENT ---
@@ -160,8 +169,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             BigDecimal combinedRate = parentRate.add(childRate);
 
             if (combinedRate.compareTo(BigDecimal.ZERO) > 0) {
-                BigDecimal combinedAmount = totalPrice.multiply(combinedRate).divide(BigDecimal.valueOf(100));
-                saveTransaction(seller, orderDetail, combinedAmount, combinedRate, EmployeeEnum.SALE_PARENT, policy);
+                if (!commissionTransactionRepository.existsByOrderDetail_IdAndCommissionRole(orderDetail.getId(), EmployeeEnum.SALE_PARENT)) {
+                    BigDecimal combinedAmount = totalPrice.multiply(combinedRate).divide(BigDecimal.valueOf(100));
+                    saveTransaction(seller, orderDetail, combinedAmount, combinedRate, EmployeeEnum.SALE_PARENT, policy);
+                }
             }
         }
     }
@@ -174,6 +185,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .commissionAmount(amount)
                 .commissionRate(rate)
                 .commissionRole(role)
+                .status(com.comission.system.enums.CommissionEnum.PENDING)
                 .createAt(Instant.now())
                 .build();
         commissionTransactionRepository.save(transaction);

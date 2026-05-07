@@ -9,7 +9,9 @@ import com.comission.system.exception.BusinessException;
 import com.comission.system.exception.ErrorCode;
 import com.comission.system.exception.NotFoundException;
 import com.comission.system.mapper.ProductMapper;
+import com.comission.system.repository.AffiliateLinkRepository;
 import com.comission.system.repository.CommissionPolicyRepository;
+import com.comission.system.repository.OrderDetailRepository;
 import com.comission.system.repository.ProductRepository;
 import com.comission.system.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -30,6 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CommissionPolicyRepository commissionPolicyRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final AffiliateLinkRepository affiliateLinkRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
@@ -59,12 +63,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Long id) {
         logger.info("Xóa sản phẩm có id là: {}", id);
-        if(productRepository.existsById(id)) {
-            productRepository.deleteById(id);
-        } else {
-            logger.info("Không tìm thấy sản phẩm có id là: {}", id);
+        if (!productRepository.existsById(id)) {
             throw new BusinessException(ErrorCode.PRODUCT_001);
         }
+
+        // Kiểm tra xem có dữ liệu liên quan không
+        if (orderDetailRepository.existsByProduct_Id(id) || affiliateLinkRepository.existsByProduct_Id(id)) {
+            throw new BusinessException(ErrorCode.PRODUCT_004);
+        }
+
+        // Xóa các policy liên quan trước (vì policy thường đi đôi với product)
+        commissionPolicyRepository.findFirstByProduct_Id(id).ifPresent(p -> commissionPolicyRepository.deleteById(p.getId()));
+
+        productRepository.deleteById(id);
     }
 
     @Override
