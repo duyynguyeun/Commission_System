@@ -24,6 +24,9 @@ export class ProductDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     const affCode = this.route.snapshot.queryParamMap.get('aff');
+    if (affCode) {
+      sessionStorage.setItem('aff_code', affCode);
+    }
 
     if (id) {
       this.loadProduct(Number(id));
