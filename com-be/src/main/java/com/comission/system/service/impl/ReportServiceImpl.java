@@ -83,10 +83,13 @@ public class ReportServiceImpl implements ReportService {
                 ? List.of()
                 : commissionTransactionRepository.findByOrderDetail_IdIn(new ArrayList<>(ownIds));
 
+        // Doanh thu sale bán
         BigDecimal ownRevenue = ownOrderDetails.stream()
                 .filter(o -> o.getSeller() != null && employeeId.equals(o.getSeller().getId()))
                 .map(this::lineRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Tổng hoa hồng mà sale được nhận
         BigDecimal ownCommission = ownTx.stream()
                 .filter(tx -> tx.getEmployee() != null && employeeId.equals(tx.getEmployee().getId()))
                 .map(CommissionTransaction::getCommissionAmount)
@@ -100,6 +103,7 @@ public class ReportServiceImpl implements ReportService {
             List<OrderDetail> childOrderDetails = childIds.stream()
                     .flatMap(id -> orderDetailRepository.findBySeller_IdOrParent_Id(id, id).stream())
                     .toList();
+            // Doanh thu của sale con
             relatedLevelRevenue = childOrderDetails.stream()
                     .filter(o -> o.getSeller() != null && childIds.contains(o.getSeller().getId()))
                     .map(this::lineRevenue)
@@ -109,6 +113,7 @@ public class ReportServiceImpl implements ReportService {
             List<CommissionTransaction> childTx = childOrderIds.isEmpty()
                     ? List.of()
                     : commissionTransactionRepository.findByOrderDetail_IdIn(new ArrayList<>(childOrderIds));
+            // Hoa hồng của sale con
             relatedLevelCommission = childTx.stream()
                     .filter(tx -> tx.getEmployee() != null && childIds.contains(tx.getEmployee().getId()))
                     .map(CommissionTransaction::getCommissionAmount)
@@ -116,6 +121,7 @@ public class ReportServiceImpl implements ReportService {
         } else if (employee.getParentId() != null) {
             Long parentId = employee.getParentId();
             List<OrderDetail> parentOrderDetails = orderDetailRepository.findBySeller_IdOrParent_Id(parentId, parentId);
+            // Doanh thu của sale cha
             relatedLevelRevenue = parentOrderDetails.stream()
                     .filter(o -> o.getSeller() != null && parentId.equals(o.getSeller().getId()))
                     .map(this::lineRevenue)
@@ -124,18 +130,21 @@ public class ReportServiceImpl implements ReportService {
             List<CommissionTransaction> parentTx = parentOrderIds.isEmpty()
                     ? List.of()
                     : commissionTransactionRepository.findByOrderDetail_IdIn(new ArrayList<>(parentOrderIds));
+            // Hoa hồng của sale cha
             relatedLevelCommission = parentTx.stream()
                     .filter(tx -> tx.getEmployee() != null && parentId.equals(tx.getEmployee().getId()))
                     .map(CommissionTransaction::getCommissionAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
+        // Hoa hồng của sale
         BigDecimal ownCommissionFromOwnSales = ownTx.stream()
                 .filter(tx -> tx.getEmployee() != null && employeeId.equals(tx.getEmployee().getId()))
                 .filter(tx -> tx.getOrderDetail().getSeller() != null && employeeId.equals(tx.getOrderDetail().getSeller().getId()))
                 .map(CommissionTransaction::getCommissionAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Hoa hồng nhận được từ sale con
         BigDecimal ownCommissionFromChildSales = ownTx.stream()
                 .filter(tx -> tx.getEmployee() != null && employeeId.equals(tx.getEmployee().getId()))
                 .filter(tx -> tx.getOrderDetail().getSeller() != null && !employeeId.equals(tx.getOrderDetail().getSeller().getId()))
@@ -190,20 +199,24 @@ public class ReportServiceImpl implements ReportService {
         List<OrderDetail> allOrders = orderDetailRepository.findAll();
         List<CommissionTransaction> allTxs = commissionTransactionRepository.findAll();
 
+        // Tổng doanh thu
         BigDecimal totalSalesRevenue = allOrders.stream()
                 .map(this::lineRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Doanh thu bán hàng trực tiếp
         BigDecimal directSalesRevenue = allOrders.stream()
                 .filter(o -> o.getSeller() == null)
                 .map(this::lineRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Doanh thu bán hàng qua sale
         BigDecimal affiliateSalesRevenue = allOrders.stream()
                 .filter(o -> o.getSeller() != null)
                 .map(this::lineRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Tổng hoa hòng chi trả cho sale
         BigDecimal totalCommissionPaid = allTxs.stream()
                 .map(CommissionTransaction::getCommissionAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -259,10 +272,12 @@ public class ReportServiceImpl implements ReportService {
         return new ArrayList<>(map.values());
     }
 
+    // Doanh thu của 1 OrderDetail
     private BigDecimal lineRevenue(OrderDetail orderDetail) {
         return orderDetail.getPrice().multiply(BigDecimal.valueOf(orderDetail.getQuantity()));
     }
 
+    // Kiểm tra nhân viên có tồn tại không
     private void ensureEmployeeExists(Long employeeId) {
         if (!employeeRepository.existsById(employeeId)) {
             throw new BusinessException(ErrorCode.EMPLOYEE_001);
