@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from '../../core/services/api.service';
 import { Product, ProductReq } from '../../core/models/api.model';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-admin-product-crud',
@@ -9,6 +11,8 @@ import { Product, ProductReq } from '../../core/models/api.model';
   styleUrls: ['./admin-product-crud.component.scss']
 })
 export class AdminProductCrudComponent implements OnInit {
+  @ViewChild('productFormDialog') productFormDialog!: TemplateRef<any>;
+
   products: Product[] = [];
   filteredProducts: Product[] = [];
   loading = false;
@@ -17,6 +21,7 @@ export class AdminProductCrudComponent implements OnInit {
   searchTerm = '';
   gridApi!: GridApi;
   showForm = false;
+  private formDialogRef: MatDialogRef<any> | null = null;
 
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
@@ -67,7 +72,7 @@ export class AdminProductCrudComponent implements OnInit {
     }
   ];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private dialog: MatDialog) {}
 
   ngOnInit(): void { this.loadProducts(); }
 
@@ -109,12 +114,24 @@ export class AdminProductCrudComponent implements OnInit {
   onSearch(): void { this.currentPage = 1; this.applyFilter(); }
 
   toggleForm(): void {
-    if (this.showForm && !this.isEditMode) { this.closeForm(); }
-    else { this.showForm = true; this.isEditMode = false; this.editingId = null; this.form = this.createEmptyForm(); this.message = ''; }
+    if (this.showForm && !this.isEditMode) {
+      this.closeForm();
+      return;
+    }
+    this.showForm = true;
+    this.isEditMode = false;
+    this.editingId = null;
+    this.form = this.createEmptyForm();
+    this.message = '';
+    this.openFormDialog();
   }
 
   closeForm(): void {
-    this.showForm = false; this.isEditMode = false; this.editingId = null; this.form = this.createEmptyForm(); this.message = '';
+    if (this.formDialogRef) {
+      this.formDialogRef.close();
+      return;
+    }
+    this.resetFormState();
   }
 
   submit(): void {
@@ -132,16 +149,27 @@ export class AdminProductCrudComponent implements OnInit {
   startEdit(product: Product): void {
     this.isEditMode = true; this.editingId = product.id; this.showForm = true; this.message = '';
     this.form = { name: product.name || '', price: Number(product.price) || 0, stockQuantity: product.stockQuantity || 0, urlImage: product.urlImage || '', description: product.description || '' };
+    this.openFormDialog();
   }
 
   remove(product: Product): void {
-    if (!window.confirm(`Xóa sản phẩm "${product.name}"?`)) return;
-    this.api.deleteProduct(product.id).subscribe({
-      next: () => { this.showToast('Xóa sản phẩm thành công!'); if (this.editingId === product.id) this.closeForm(); this.loadProducts(); },
-      error: err => this.showToast(err?.error?.message || 'Không thể xóa sản phẩm.', 'error')
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Xác nhận xóa sản phẩm',
+        message: `Bạn có chắc chắn muốn xóa sản phẩm "${product.name}"?`,
+        confirmText: 'Xóa',
+        cancelText: 'Hủy'
+      }
+    }).afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      this.api.deleteProduct(product.id).subscribe({
+        next: () => { this.showToast('Xóa sản phẩm thành công!'); if (this.editingId === product.id) this.closeForm(); this.loadProducts(); },
+        error: err => this.showToast(err?.error?.message || 'Không thể xóa sản phẩm.', 'error')
+      });
     });
   }
-
   onActionClick(event: CellClickedEvent): void {
     const target = event.event?.target as HTMLElement | null;
     const action = target?.getAttribute('data-action');
@@ -172,6 +200,32 @@ export class AdminProductCrudComponent implements OnInit {
   }
 
   private formatCurrency(value: number): string {
-    return `${new Intl.NumberFormat('vi-VN').format(value || 0)}đ`;
+    return `${new Intl.NumberFormat('vi-VN').format(value || 0)} đ`;
+  }
+
+  private openFormDialog(): void {
+    if (this.formDialogRef) {
+      this.formDialogRef.close();
+    }
+    this.formDialogRef = this.dialog.open(this.productFormDialog, {
+      width: '760px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      disableClose: this.saving
+    });
+    this.formDialogRef.afterClosed().subscribe(() => {
+      this.formDialogRef = null;
+      this.resetFormState();
+    });
+  }
+
+  private resetFormState(): void {
+    this.showForm = false;
+    this.isEditMode = false;
+    this.editingId = null;
+    this.form = this.createEmptyForm();
+    this.message = '';
   }
 }
+
+

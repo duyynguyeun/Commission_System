@@ -29,6 +29,7 @@ import { AdminUserCrudComponent } from './pages/admin-user-crud/admin-user-crud.
 import { SaleProductListComponent } from './pages/sale-product-list/sale-product-list.component';
 import { AffiliateLinkDialogComponent } from './pages/affiliate-link-dialog/affiliate-link-dialog.component';
 import { AdminCommissionPolicyComponent } from './pages/admin-commission-policy/admin-commission-policy.component';
+import { ConfirmDialogComponent } from './pages/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { AdminCommissionPolicyComponent } from './pages/admin-commission-policy/
     AdminUserCrudComponent,
     SaleProductListComponent,
     AffiliateLinkDialogComponent,
-    AdminCommissionPolicyComponent
+    AdminCommissionPolicyComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -72,7 +74,8 @@ import { AdminCommissionPolicyComponent } from './pages/admin-commission-policy/
     RegisterDialogComponent, 
     LoginComponent, 
     AffiliateLinkDialogComponent, 
-    PurchaseConfirmDialogComponent
+    PurchaseConfirmDialogComponent,
+    ConfirmDialogComponent
   ]
 })
 export class AppModule { }

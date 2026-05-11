@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ColDef, GridApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from '../../core/services/api.service';
 import { Customer, CustomerReq, Employee, EmployeeReq } from '../../core/models/api.model';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 type ManagedUserType = 'CUSTOMER' | 'SALE_PARENT' | 'SALE_CHILD' | 'ADMIN';
 
@@ -25,6 +27,8 @@ interface ManagedUserRow {
   styleUrls: ['./admin-user-crud.component.scss']
 })
 export class AdminUserCrudComponent implements OnInit {
+  @ViewChild('userFormDialog') userFormDialog!: TemplateRef<any>;
+
   users: ManagedUserRow[] = [];
   filteredUsers: ManagedUserRow[] = [];
   loading = false;
@@ -35,6 +39,7 @@ export class AdminUserCrudComponent implements OnInit {
   roleFilter = 'ALL';
   gridApi!: GridApi;
   showForm = false;
+  private formDialogRef: MatDialogRef<any> | null = null;
 
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
@@ -90,7 +95,7 @@ export class AdminUserCrudComponent implements OnInit {
     }
   ];
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private dialog: MatDialog) {}
   ngOnInit(): void {
     this.loadUsers();
     this.loadParents();
@@ -145,11 +150,25 @@ export class AdminUserCrudComponent implements OnInit {
   onSearch(): void { this.currentPage = 1; this.applyFilter(); }
 
   toggleForm(): void {
-    if (this.showForm && !this.isEditMode) this.closeForm();
-    else { this.showForm = true; this.isEditMode = false; this.editingId = null; this.form = this.createEmptyForm(); this.message = ''; }
+    if (this.showForm && !this.isEditMode) {
+      this.closeForm();
+      return;
+    }
+    this.showForm = true;
+    this.isEditMode = false;
+    this.editingId = null;
+    this.form = this.createEmptyForm();
+    this.message = '';
+    this.openFormDialog();
   }
 
-  closeForm(): void { this.showForm = false; this.isEditMode = false; this.editingId = null; this.form = this.createEmptyForm(); this.message = ''; }
+  closeForm(): void {
+    if (this.formDialogRef) {
+      this.formDialogRef.close();
+      return;
+    }
+    this.resetFormState();
+  }
 
   submit(): void {
     if (!this.form.username.trim() || !this.form.fullName.trim()) { this.message = 'Tên đăng nhập và họ tên là bắt buộc.'; return; }
@@ -172,16 +191,27 @@ export class AdminUserCrudComponent implements OnInit {
   startEdit(user: ManagedUserRow): void {
     this.isEditMode = true; this.editingId = user.id; this.editingEntityType = user.entityType; this.showForm = true; this.message = '';
     this.form = { role: user.role, username: user.username, password: '', fullName: user.fullName, parentId: user.parentId || null, dob: user.dob || '', address: user.address || '' };
+    this.openFormDialog();
   }
 
   remove(user: ManagedUserRow): void {
-    if (!window.confirm(`Xóa tài khoản "${user.username}"?`)) return;
-    (user.entityType === 'CUSTOMER' ? this.api.deleteCustomer(user.id) : this.api.deleteEmployee(user.id)).subscribe({
-      next: () => { this.showToast('Xóa người dùng thành công!'); if (this.editingId === user.id) this.closeForm(); this.loadUsers(); },
-      error: e => this.showToast(e?.error?.message || 'Không thể xóa người dùng.', 'error')
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Xác nhận xóa người dùng',
+        message: `Bạn có chắc chắn muốn xóa tài khoản "${user.username}"?`,
+        confirmText: 'Xóa',
+        cancelText: 'Hủy'
+      }
+    }).afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+      (user.entityType === 'CUSTOMER' ? this.api.deleteCustomer(user.id) : this.api.deleteEmployee(user.id)).subscribe({
+        next: () => { this.showToast('Xóa người dùng thành công!'); if (this.editingId === user.id) this.closeForm(); this.loadUsers(); },
+        error: e => this.showToast(e?.error?.message || 'Không thể xóa người dùng.', 'error')
+      });
     });
   }
-
   onActionClick(event: CellClickedEvent): void {
     const action = (event.event?.target as HTMLElement)?.getAttribute('data-action');
     if (!action || !event.data) return;
@@ -206,10 +236,45 @@ export class AdminUserCrudComponent implements OnInit {
     return p;
   }
 
-  private onSaved(): void { this.saving = false; this.showToast(this.isEditMode ? 'Cập nhật người dùng thành công!' : 'Tạo người dùng thành công!'); this.closeForm(); this.loadUsers(); }
-  private onSaveError(e: any): void { this.saving = false; this.message = e?.error?.message || 'Không thể lưu người dùng.'; }
+  private onSaved(): void {
+    this.saving = false;
+    this.showToast(this.isEditMode ? 'Cập nhật người dùng thành công!' : 'Tạo người dùng thành công!');
+    this.closeForm();
+    this.loadUsers();
+  }
+
+  private onSaveError(e: any): void {
+    this.saving = false;
+    this.message = e?.error?.message || 'Không thể lưu người dùng.';
+  }
+
+  private openFormDialog(): void {
+    if (this.formDialogRef) {
+      this.formDialogRef.close();
+    }
+    this.formDialogRef = this.dialog.open(this.userFormDialog, {
+      width: '760px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      disableClose: this.saving
+    });
+    this.formDialogRef.afterClosed().subscribe(() => {
+      this.formDialogRef = null;
+      this.resetFormState();
+    });
+  }
+
+  private resetFormState(): void {
+    this.showForm = false;
+    this.isEditMode = false;
+    this.editingId = null;
+    this.form = this.createEmptyForm();
+    this.message = '';
+  }
 
   private createEmptyForm() {
     return { role: 'CUSTOMER' as ManagedUserType, username: '', password: '', fullName: '', parentId: null as number | null, dob: '', address: '' };
   }
 }
+
+
