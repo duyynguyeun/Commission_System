@@ -1,0 +1,25 @@
+# Stage 1: Xây dựng môi trường và chuyển đổi source code sang các file tĩnh (html, css, js)
+FROM node:12-alpine AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+# Stage 2: Khi đã Run ra các file tĩnh thì sẽ dùng nginx để là server giúp cho trình duyệt giao tiếp được với các file tĩnh này
+FROM nginx:alpine
+
+# 1. XÓA SẠCH trang mặc định của Nginx (Rất quan trọng để tránh lỗi hiển thị nhầm)
+RUN rm -rf /usr/share/nginx/html/*
+
+# 2. Sửa lại đường dẫn COPY
+# NẾU DÙNG ANGULAR: Bạn phải trỏ vào tận thư mục con bên trong dist. 
+COPY --from=build /app/dist/com-fe /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -67,12 +67,10 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException(ErrorCode.PRODUCT_001);
         }
 
-        // Kiểm tra xem có dữ liệu liên quan không
         if (orderDetailRepository.existsByProduct_Id(id) || affiliateLinkRepository.existsByProduct_Id(id)) {
             throw new BusinessException(ErrorCode.PRODUCT_004);
         }
 
-        // Xóa các policy liên quan trước (vì policy thường đi đôi với product)
         commissionPolicyRepository.findFirstByProduct_Id(id).ifPresent(p -> commissionPolicyRepository.deleteById(p.getId()));
 
         productRepository.deleteById(id);
